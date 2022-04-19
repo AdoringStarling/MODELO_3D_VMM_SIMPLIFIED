@@ -22,7 +22,7 @@ z_topo,x_topo,y_topo=mesh_topo.values,mesh_topo.columns,mesh_topo.index
 
 #Base de datos de sismos convertidos a csv desde http://bdrsnc.sgc.gov.co/paginas1/catalogo/Consulta_Valle_Medio/valle_medio.php
 #df_sismos=pd.read_csv("datasets/reporte_1.csv")#,delimiter=';',decimal=',')
-df_sismos=pd.read_csv(r'datasets\reporte_LBG_2.csv')
+df_sismos=pd.read_csv(r'datasets\reporte_LBG.csv')
 df_sismos['FECHA - HORA UTC']=df_sismos['Fecha  (UTC)'].astype(str)+' '+df_sismos['Hora  (UTC)'].astype(str)
 df_sismos.rename(columns = {'Latitud(°)':'LATITUD (°)', 
                                 'Longitud(°)':'LONGITUD (°)',
@@ -69,7 +69,7 @@ del df_sismos_err
 del df_sismos_no_err
 
 #Inyeccion de H2O
-iny=pd.read_csv(r'datasets\INYECCION_geo.csv',delimiter=';',decimal=',')
+iny=pd.read_csv(r'datasets\inyeccion_geo.csv',delimiter=';',decimal=',')
 iny=iny[:-1]
 
 
@@ -91,7 +91,7 @@ for name,lon,lat,alt in zip(iny['CAMPO'].apply(lambda x:str(x)),iny['X'],iny['Y'
     inyec.append(un)
 
 #Kale
-df_kale=pd.read_csv('datasets/Kale.csv')
+df_kale=pd.read_csv('datasets/kale.csv')
 df_kale['msnm']=[69]*3
 
 kale= go.Scatter3d(
@@ -345,7 +345,7 @@ STA_LOM = go.Scatter3d(
 )
 
 #Rios
-df_rivers=pd.read_csv('datasets\drenajes.csv')
+df_rivers=pd.read_csv('datasets\drenajes_SIM.csv')
 
 #Cargar datos de pozos
 df_pozos=pd.read_csv('datasets/pozos.csv',usecols=['lon', 'lat', 'UWI', 'WELL_NAME', 
@@ -377,7 +377,7 @@ Pozos = go.Scatter3d(
 )
 
 #Rezumaderos
-df_rezumaderos=pd.read_csv('datasets\REZUMADEROS_WGS84.txt',decimal=',',delimiter=';')
+df_rezumaderos=pd.read_csv('datasets\REZUMADEROS_WGS84_SIM.txt',decimal=',',delimiter=';')
 rez_txt=('Longitud:'+df_rezumaderos['X'].apply(lambda x:str(x))+'°'+
             '<br>'+'Latitud:'+df_rezumaderos['Y'].apply(lambda x:str(x))+'°'+
             '<br>'+'Elevacion:'+df_rezumaderos['Z'].apply(lambda x:str(x))+'msnm'+
@@ -401,7 +401,7 @@ rez = go.Scatter3d(
     )
 )
 #Poblaciones
-df_poblaciones=pd.read_csv('datasets/Poblaciones_1.csv',usecols=['Name','Longitud','Latitud','SAMPLE_1'])
+df_poblaciones=pd.read_csv('datasets/poblaciones.csv',usecols=['Name','Longitud','Latitud','SAMPLE_1'])
 Poblaciones = go.Scatter3d(
     x=df_poblaciones['Longitud'],
     y=df_poblaciones['Latitud'],
@@ -434,31 +434,31 @@ for name,lon,lat,alt in zip(df_poblaciones['Name'],df_poblaciones['Longitud'],df
     Pobl.append(un)
 
 #Carreteras
-roads=pd.read_csv('datasets\Via_WGS84.txt',delimiter=';',decimal=',')
+roads=pd.read_csv('datasets\Via_WGS84_SIM.txt',delimiter=';',decimal=',')
 roads  =roads[(roads['LATITUD']>lai)&(roads['LATITUD']<las)&(roads['LONGITUD']>loi)&(roads['LONGITUD']<los)]
 
 # ls_x,ls_y,ls_z=lin_list('datasets/fallas.csv') #Fallas
-fallas=pd.read_csv('datasets/fallas.csv',decimal=',')
+fallas=pd.read_csv('datasets/fallas_SIM.csv',decimal=',')
 fallas['X']=fallas['X'].apply(lambda x:float(x))
 fallas['Y']=fallas['Y'].apply(lambda x:float(x))
 fallas['Z']=fallas['Z'].apply(lambda x:float(x))
-fallas_1=pd.read_csv('datasets/fallas_1.csv')
+fallas_1=pd.read_csv('datasets/fallas_1_SIM.csv')
 fallas_1=fallas_1.drop_duplicates(subset=['LINE_ID'])
 
 # ls_x_f,ls_y_f,ls_z_f=lin_list('datasets/campos.csv') #Campos
-campet=pd.read_csv('datasets\campos.csv',decimal=',')
+campet=pd.read_csv('datasets\campos_SIM.csv',decimal=',')
 campet['X']=campet['X'].apply(lambda x:float(x))
 campet['Y']=campet['Y'].apply(lambda x:float(x))
 campet['Z']=campet['Z'].apply(lambda x:float(x))
-campet_1=pd.read_csv('datasets/campos_1.csv')
+campet_1=pd.read_csv('datasets/campos_1_SIM.csv')
 campet_1=campet_1.drop_duplicates(subset=['LINE_ID'])
 
 # ls_x_s,ls_y_s,ls_z_s=lin_list('datasets/lineas.csv') #Lineas sismicas
-linsis=pd.read_csv('datasets\lineas.csv',decimal=',')
+linsis=pd.read_csv('datasets\lineas_SIM.csv',decimal=',')
 linsis['X']=linsis['X'].apply(lambda x:float(x))
 linsis['Y']=linsis['Y'].apply(lambda x:float(x))
 linsis['Z']=linsis['Z'].apply(lambda x:float(x))
-linsis_1=pd.read_csv('datasets/lineas_1.csv')
+linsis_1=pd.read_csv('datasets/lineas_1_SIM.csv')
 linsis_1=linsis_1.drop_duplicates(subset=['LINE_ID'])
 
 
@@ -518,6 +518,7 @@ card_main=dbc.Card(
                 max=df_sismos['MAGNITUD'].max(),
                 step=0.1,
                 value=[df_sismos['MAGNITUD'].min(), df_sismos['MAGNITUD'].max()],
+                # marks=None,
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": True}
             ),
@@ -528,6 +529,7 @@ card_main=dbc.Card(
                 max=df_sismos['PROF. (m)'].max(),
                 step=100,
                 value=[df_sismos['PROF. (m)'].min(), df_sismos['PROF. (m)'].max()],
+                # marks=None,
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": True}
             ),
