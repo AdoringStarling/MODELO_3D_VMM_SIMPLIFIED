@@ -1,14 +1,19 @@
-OID_,Name,FolderPath,SymbolID,AltMode,Base,Snippet,PopupInfo,HasLabel,LabelID,SAMPLE_1,Longitud,Latitud
-"0",Aguachica,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",157,-73.617,8.307
-"0",Barrancabermeja,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",82,-73.855,7.064
-"0",Bucaramanga,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",904,-73.114,7.098
-"0",Lebrija,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",1014,-73.217,7.115
-"0",Morales,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",38,-73.870,8.274
-"0",Puerto Wilches,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",65,-73.892,7.345
-"0",Sabana de Torres,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",134,-73.499,7.393
-"0",San Alberto,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",116,-73.394,7.761
-"0",San Martin,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",112,-73.512,8.002
-"0",San Pablo,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",68,-73.925,7.476
-"0",Simiti,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",50,-73.946,7.957
-"0",Yondó,Poblaciones.kmz/Poblaciones,"0","-1",0.00000000000,,,"-1","0",70,-73.910,7.009
-"0",Gamarra,,"0","0",0.00000000000,,,"0","0",41,-73.741,8.325
+OID_,Name,FolderPath,SymbolID,AltMode,Base,Snippet,PopupInfo,HasLabel,LabelID,lat,lon,outputSRTM1
+"0",AGUACHICA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,200111000CESARAguachicaAGUACHICA1,"-1","0",8.3105390650,-73.6148732000,164.4049993100
+"0",BARRANCABERMEJA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,680811000SANTANDERBarrancabermejaBARRANCABERMEJA1,"-1","0",7.0672519820,-73.8531699000,83.4413431340
+"0",BUCARAMANGA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,680011000SANTANDERBucaramangaBUCARAMANGA1,"-1","0",7.1181171220,-73.1358739000,906.8652738900
+"0",CASABE,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,058931000ANTIOQUIAYondoCASABE1,"-1","0",7.0055398170,-73.9138612000,71.7813187330
+"0",GAMARRA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,202951000CESARGamarraGAMARRA1,"-1","0",8.3247166300,-73.7461392000,38.6756361540
+"0",LEBRIJA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,684061000SANTANDERLebrijaLEBRIJA1,"-1","0",7.1171793830,-73.2240002000,1026.5434208000
+"0",MORALES,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,134731000BOLIVARMoralesMORALES1,"-1","0",8.2778740020,-73.8719193000,37.6299093880
+"0",OCANA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,544981000NORTE DE SANTANDEROcanaOCANA1,"-1","0",8.2464512400,-73.3581940000,1178.6823842000
+"0",PELAYA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,205501000CESARPelayaPELAYA1,"-1","0",8.6909152840,-73.6689776000,68.2199914270
+"0",PUERTO PARRA,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,685731000SANTANDERPuerto ParraPUERTO PARRA1,"-1","0",6.6543337960,-74.0598735000,95.6779140980
+"0",PUERTO WILCHES,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,685751000SANTANDERPuerto WilchesPUERTO WILCHES1,"-1","0",7.3485844820,-73.9034104000,63.3157840140
+"0",RIO VIEJO,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,136001000BOLIVARRio ViejoRIO VIEJO1,"-1","0",8.5908126680,-73.8430781000,35.0679372220
+"0",SABANA DE TORRES,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,686551000SANTANDERSabana de TorresSABANA DE TORRES1,"-1","0",7.3967655340,-73.5033341000,127.1111023300
+"0",SAN ALBERTO,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,207101000CESARSan AlbertoSAN ALBERTO1,"-1","0",7.7639303100,-73.3967376000,112.9543517000
+"0",SAN MARTIN,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,207701000CESARSan MartinSAN MARTIN1,"-1","0",8.0066885950,-73.5158886000,100.4650365800
+"0",SAN PABLO,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,136701000BOLIVARSan PabloSAN PABLO1,"-1","0",7.4806349280,-73.9275384000,63.7729364040
+"0",SAN VICENTE CHUCURI,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,686891000SANTANDERSan Vicente de ChucuriSAN VICENTE CHUCURI1,"-1","0",6.8815641470,-73.4151237000,615.0847188900
+"0",SANTA ROSA DEL SUR,Centro poblados.kmz/Centro poblados,"0","-1",0.0000000000,,136881000BOLIVARSanta Rosa Del SurSANTA ROSA DEL SUR1,"-1","0",7.9663352600,-74.0540727000,617.2586708600

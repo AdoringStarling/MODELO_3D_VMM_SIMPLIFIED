@@ -401,11 +401,11 @@ rez = go.Scatter3d(
     )
 )
 #Poblaciones
-df_poblaciones=pd.read_csv('datasets/poblaciones.csv',usecols=['Name','Longitud','Latitud','SAMPLE_1'])
+df_poblaciones=pd.read_csv('datasets/poblaciones.csv',usecols=['Name','lon','lat','outputSRTM1'])
 Poblaciones = go.Scatter3d(
-    x=df_poblaciones['Longitud'],
-    y=df_poblaciones['Latitud'],
-    z=df_poblaciones['SAMPLE_1']+10, #Conseguir alturas
+    x=df_poblaciones['lon'],
+    y=df_poblaciones['lat'],
+    z=df_poblaciones['outputSRTM1']+10, #Conseguir alturas
     mode='markers',
     name="Población",
     marker_symbol='square',
@@ -417,7 +417,8 @@ Poblaciones = go.Scatter3d(
     textposition="bottom right"
 )
 Pobl=[]
-for name,lon,lat,alt in zip(df_poblaciones['Name'],df_poblaciones['Longitud'],df_poblaciones['Latitud'],df_poblaciones['SAMPLE_1']):
+for name,lon,lat,alt in zip(df_poblaciones['Name'],df_poblaciones['lon'],
+df_poblaciones['lat'],df_poblaciones['outputSRTM1']):
     un=dict(
             showarrow=False,
             x=lon,
