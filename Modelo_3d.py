@@ -479,8 +479,26 @@ df_new=pd.read_csv('datasets/UN_CRN_COLORS.csv',index_col=None)
 # SISMICA=img_3d("assets/perfil_2.jpg",-76.2239,6.80483056000,-72.953083300,9.0807305600,4000,-15000)
 # SISMICA=img_3d("assets/perfil_2.jpg",-72.953083300,9.0807305600,-76.2239,6.80483056000,4000,-15000)
 # SISMICA=img_3d("assets/perfil_2.jpg",-76.2239,9.0807305600,-72.953083300,6.80483056000,4000,-15000)
-SISMICA=img_3d("assets/perfil_2.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
+SISMICA=img_3d("assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
 # SISMICA=img_3d("assets/perfil_2.jpg",-72.954,6.806,-74.115,7.586,4000,-20000)
+
+#Texto de imagenes
+df_andina=pd.read_csv('datasets\Coordenadas_textos_perfil_trasandina.csv',delimiter=';')
+txts_p=[]
+for name,lon,lat,alt in zip(df_andina['texto'],df_andina['x'],df_andina['y'], df_andina['z']):
+    un=dict(
+            showarrow=False,
+            x=lon,
+            y=lat,
+            z=alt,
+            text=name,
+            xshift=0,
+            opacity=0.7,
+            font=dict(
+                color="white",
+                size=12
+            ))
+    txts_p.append(un)
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
@@ -802,11 +820,6 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                 hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
         if np.isin('POZO', PETRO):
             fig.add_trace(Pozos)
-        # if np.isin('INY', PETRO):
-        #     fig.add_trace(INYECCION)
-        #     fig.update_layout(
-        #         scene=dict(
-        #         annotations=inyec))
         if len(INY)>1:
             for i in iny['CAMPO']:
                     inyc=iny[iny['CAMPO']==i]
@@ -886,6 +899,27 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
         if np.isin('SEIS', PETRO):
                 fig.add_trace(SISMICA)
+                fig.update_layout(scene=dict(annotations=txts_p))
+        fig.add_trace(go.Cone(x=[-73.2], y=[8.5], z=[10000],
+                      u=[0], v=[10], w=[0],
+                     sizemode='scaled',
+                     sizeref=0.015,
+                     showscale=False,
+                     colorscale=['black','black']))
+        fig.update_layout(
+                scene=dict(
+                annotations=[dict(
+                            showarrow=False,
+                            x=-73.3,
+                            y=8.5,
+                            z=10000,
+                            text='N',
+                            xanchor="left",
+                            xshift=0,
+                            opacity=1,
+                            font=dict(
+                                color="black",
+                                size=20))]))
         fig.update_layout(autosize=False,
                         width=850, height=1200,
                         margin=dict(l=50, r=50, b=50, t=50),)
