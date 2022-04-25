@@ -90,212 +90,220 @@ for name,lon,lat,alt in zip(iny['CAMPO'].apply(lambda x:str(x)),iny['X'],iny['Y'
             ))
     inyec.append(un)
 
-#Kale
-df_kale=pd.read_csv('datasets/kale.csv')
-df_kale['msnm']=[69]*3
 
-kale= go.Scatter3d(
-    x=np.array(-73.85660000000),
-    y=np.array(7.36551000000),
-    z=np.array(69+100),
-    mode='markers',
-    marker_symbol='diamond',
-    name="PPII Kalé",
-    hovertemplate ='PPII Kalé',
-    marker=dict(
-        size=10,
-        color='gold'
-    )
-)
-#Semaforo sismico Kale
-pozo_inv_kale = df_kale[df_kale['Tipo']=='Investigación']
-x_pozo_inv_kale, y_pozo_inv_kale  = pozo_inv_kale['Longitud'].values[0], pozo_inv_kale['Latitud'].values[0]
-h_pozo_inv_kale = 3.902 #km
-h_pozo_inv_kale_m = h_pozo_inv_kale*1000 #m
-r_ext = 2*h_pozo_inv_kale_m+20000 #m
+kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3=vol_sus(-73.8566, 7.36551,3902,'Kalé - Investigación','yellow')
+kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3=vol_sus(-73.8571014, 7.3647799,2618.232,'Kalé - Inyector','blue')
+plai,picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3=vol_sus(-73.89389, 7.2572498,3227.8,'Platero - Investigación','red')
+play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3=vol_sus(-73.8944016, 7.25667,2325.6,'Platero - Inyector','green')
 
-#Asignamos las dimensiones y ubicacion del cilindro interno y externo respectivamente
-r1 = 2*h_pozo_inv_kale_m /(111.1*1000) #Radio interno es dos veces la profundidad medida del pozo. De acuerdo con Resolución 40185 del 2020 del MME. Profundidad aproximada en pozo de investigación es 3902 m
-a1 = 0 #Altura
-h1 = -16000 #Profundidad del cilindro de 16 km
-x01=float(x_pozo_inv_kale)
-y01=float(y_pozo_inv_kale)
+kalec,_,_,_,_,_,_=vol_sus(-73.8570023, 7.3647499,2325.6,'Kalé - Captador','orange')
+plac,_,_,_,_,_,_=vol_sus(-73.8943024, 7.2566800,2325.6,'Platero - Captador','gold')
+# #Kale
+# df_kale=pd.read_csv('datasets/kale.csv')
+# df_kale['msnm']=[69]*3
 
-r2 = (2*h_pozo_inv_kale_m+20000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
-a2 = 0 #Altura
-h2 = -16000 #Profundidad del cilindro de 16 km
-x02=float(x_pozo_inv_kale)
-y02=float(y_pozo_inv_kale)
+# kale= go.Scatter3d(
+#     x=np.array(-73.85660000000),
+#     y=np.array(7.36551000000),
+#     z=np.array(69+100),
+#     mode='markers',
+#     marker_symbol='diamond',
+#     name="PPII Kalé",
+#     hovertemplate ='PPII Kalé',
+#     marker=dict(
+#         size=10,
+#         color='gold'
+#     )
+# )
+# #Semaforo sismico Kale
+# pozo_inv_kale = df_kale[df_kale['Tipo']=='Investigación']
+# x_pozo_inv_kale, y_pozo_inv_kale  = pozo_inv_kale['Longitud'].values[0], pozo_inv_kale['Latitud'].values[0]
+# h_pozo_inv_kale = 3.902 #km
+# h_pozo_inv_kale_m = h_pozo_inv_kale*1000 #m
+# r_ext = 2*h_pozo_inv_kale_m+20000 #m
 
-r3 = (50000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
-a3 = 0 #Altura
-h3 = -32000 #Profundidad del cilindro de 16 km
-x03=float(x_pozo_inv_kale)
-y03=float(y_pozo_inv_kale)
+# #Asignamos las dimensiones y ubicacion del cilindro interno y externo respectivamente
+# r1 = 2*h_pozo_inv_kale_m /(111.1*1000) #Radio interno es dos veces la profundidad medida del pozo. De acuerdo con Resolución 40185 del 2020 del MME. Profundidad aproximada en pozo de investigación es 3902 m
+# a1 = 0 #Altura
+# h1 = -16000 #Profundidad del cilindro de 16 km
+# x01=float(x_pozo_inv_kale)
+# y01=float(y_pozo_inv_kale)
 
-#Efectuamos los calculos correspondientes  a la funcion
-x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
-x2, y2, z2 = cylinder(r2, h2,x02,y02, a=a2)
-x3, y3, z3 = cylinder(r3, h3,x03,y03, a=a3)
+# r2 = (2*h_pozo_inv_kale_m+20000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
+# a2 = 0 #Altura
+# h2 = -16000 #Profundidad del cilindro de 16 km
+# x02=float(x_pozo_inv_kale)
+# y02=float(y_pozo_inv_kale)
 
-#Elaboramos la proyeccion para el volumen de suspension
-cyl1 = go.Surface(x=x1, y=y1, z=z1,
-                 colorscale = [[0, 'red'],[1, 'red']],#El color se da porque aqui es donde se analizan los sismos 
-                                                            #que pueden dar un alarma verde,amarilla o naranja
-                 showscale=False,
-                 opacity=0.5,
-                 name='Volumen monitoreo estado rojo')
-xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
-xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
+# r3 = (50000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
+# a3 = 0 #Altura
+# h3 = -32000 #Profundidad del cilindro de 16 km
+# x03=float(x_pozo_inv_kale)
+# y03=float(y_pozo_inv_kale)
 
-bcircles1 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='red', width=2),
-                        opacity =0.55, showlegend=False,
-                        name='Volumen monitoreo estado rojo')
+# #Efectuamos los calculos correspondientes  a la funcion
+# x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
+# x2, y2, z2 = cylinder(r2, h2,x02,y02, a=a2)
+# x3, y3, z3 = cylinder(r3, h3,x03,y03, a=a3)
 
-#Elaboramos la proyeccion para el volumen de monitoreo
-cyl2 = go.Surface(x=x2, y=y2, z=z2,
-                 colorscale = [[0, 'green'],[1, 'orange']],
-                 showscale=False,
-                 opacity=0.7,
-                 name='Volumen monitoreo para estado verde,amarillo y naranja')
+# #Elaboramos la proyeccion para el volumen de suspension
+# cyl1 = go.Surface(x=x1, y=y1, z=z1,
+#                  colorscale = [[0, 'red'],[1, 'red']],#El color se da porque aqui es donde se analizan los sismos 
+#                                                             #que pueden dar un alarma verde,amarilla o naranja
+#                  showscale=False,
+#                  opacity=0.5,
+#                  name='Volumen monitoreo estado rojo')
+# xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
+# xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
 
-xb_low, yb_low, zb_low = boundary_circle(r2, a2,x02,y02)
-xb_up, yb_up, zb_up = boundary_circle(r2,a2+h2,x02,y02)
+# bcircles1 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='red', width=2),
+#                         opacity =0.55, showlegend=False,
+#                         name='Volumen monitoreo estado rojo')
 
-#Bordes
-bcircles2 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='green', width=2),
-                        opacity =0.75, showlegend=False,
-                        name='Volumen monitoreo para estado verde,amarillo y naranja'
-                        )
+# #Elaboramos la proyeccion para el volumen de monitoreo
+# cyl2 = go.Surface(x=x2, y=y2, z=z2,
+#                  colorscale = [[0, 'green'],[1, 'orange']],
+#                  showscale=False,
+#                  opacity=0.7,
+#                  name='Volumen monitoreo para estado verde,amarillo y naranja')
 
-#Elaboramos la proyeccion para el cilindro de volumen externo
-cyl3 = go.Surface(x=x3, y=y3, z=z3,
-                 colorscale = [[0, 'aqua'],[1, 'aqua']],
-                 showscale=False,
-                 opacity=0.4,
-                 name='Volumen externo')
+# xb_low, yb_low, zb_low = boundary_circle(r2, a2,x02,y02)
+# xb_up, yb_up, zb_up = boundary_circle(r2,a2+h2,x02,y02)
 
-xb_low, yb_low, zb_low = boundary_circle(r3, a3,x03,y03)
-xb_up, yb_up, zb_up = boundary_circle(r3,a3+h3,x03,y03)
+# #Bordes
+# bcircles2 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='green', width=2),
+#                         opacity =0.75, showlegend=False,
+#                         name='Volumen monitoreo para estado verde,amarillo y naranja'
+#                         )
 
-#Bordes
-bcircles3 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='blue', width=2),
-                        opacity =0.75, showlegend=False,
-                        name='Volumen externo'
-                        )
+# #Elaboramos la proyeccion para el cilindro de volumen externo
+# cyl3 = go.Surface(x=x3, y=y3, z=z3,
+#                  colorscale = [[0, 'aqua'],[1, 'aqua']],
+#                  showscale=False,
+#                  opacity=0.4,
+#                  name='Volumen externo')
 
-#Platero
-platero= go.Scatter3d(
-    x=np.array(-73.8938980),
-    y=np.array(7.2572498),
-    z=np.array(69+100),
-    mode='markers',
-    marker_symbol='diamond',
-    name="PPII Platero",
-    hovertemplate ='PPII Platero',
-    marker=dict(
-        size=10,
-        color='gold'
-    )
-)
-#Semaforo sismico Platero
-x_pozo_inv_plat, y_pozo_inv_plat  = -73.8938980,7.2572498
-h_pozo_inv_plat_m = 3227.8 #m
-r_ext_plat = 2*h_pozo_inv_plat_m+20000 #m
+# xb_low, yb_low, zb_low = boundary_circle(r3, a3,x03,y03)
+# xb_up, yb_up, zb_up = boundary_circle(r3,a3+h3,x03,y03)
 
-#Asignamos las dimensiones y ubicacion del cilindro interno y externo respectivamente
-r1 = 2*h_pozo_inv_plat_m /(111.1*1000) #Radio interno es dos veces la profundidad medida del pozo. De acuerdo con Resolución 40185 del 2020 del MME. Profundidad aproximada en pozo de investigación es 3902 m
-a1 = 0 #Altura
-h1 = -16000 #Profundidad del cilindro de 16 km
-x01=float(x_pozo_inv_plat)
-y01=float(y_pozo_inv_plat)
+# #Bordes
+# bcircles3 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='blue', width=2),
+#                         opacity =0.75, showlegend=False,
+#                         name='Volumen externo'
+#                         )
 
-r2 = (2*h_pozo_inv_plat_m+20000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
-a2 = 0 #Altura
-h2 = -16000 #Profundidad del cilindro de 16 km
-x02=float(x_pozo_inv_plat)
-y02=float(y_pozo_inv_plat)
+# #Platero
+# platero= go.Scatter3d(
+#     x=np.array(-73.8938980),
+#     y=np.array(7.2572498),
+#     z=np.array(69+100),
+#     mode='markers',
+#     marker_symbol='diamond',
+#     name="PPII Platero",
+#     hovertemplate ='PPII Platero',
+#     marker=dict(
+#         size=10,
+#         color='gold'
+#     )
+# )
+# #Semaforo sismico Platero
+# x_pozo_inv_plat, y_pozo_inv_plat  = -73.8938980,7.2572498
+# h_pozo_inv_plat_m = 3227.8 #m
+# r_ext_plat = 2*h_pozo_inv_plat_m+20000 #m
 
-r3 = (50000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
-a3 = 0 #Altura
-h3 = -32000 #Profundidad del cilindro de 16 km
-x03=float(x_pozo_inv_plat)
-y03=float(y_pozo_inv_plat)
+# #Asignamos las dimensiones y ubicacion del cilindro interno y externo respectivamente
+# r1 = 2*h_pozo_inv_plat_m /(111.1*1000) #Radio interno es dos veces la profundidad medida del pozo. De acuerdo con Resolución 40185 del 2020 del MME. Profundidad aproximada en pozo de investigación es 3902 m
+# a1 = 0 #Altura
+# h1 = -16000 #Profundidad del cilindro de 16 km
+# x01=float(x_pozo_inv_plat)
+# y01=float(y_pozo_inv_plat)
 
-#Efectuamos los calculos correspondientes  a la funcion
-x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
-x2, y2, z2 = cylinder(r2, h2,x02,y02, a=a2)
-x3, y3, z3 = cylinder(r3, h3,x03,y03, a=a3)
+# r2 = (2*h_pozo_inv_plat_m+20000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
+# a2 = 0 #Altura
+# h2 = -16000 #Profundidad del cilindro de 16 km
+# x02=float(x_pozo_inv_plat)
+# y02=float(y_pozo_inv_plat)
 
-#Elaboramos la proyeccion para el volumen de suspension
-cyl1p = go.Surface(x=x1, y=y1, z=z1,
-                 colorscale = [[0, 'red'],[1, 'red']],#El color se da porque aqui es donde se analizan los sismos 
-                                                            #que pueden dar un alarma verde,amarilla o naranja
-                 showscale=False,
-                 opacity=0.5,
-                 name='Volumen monitoreo estado rojo')
-xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
-xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
+# r3 = (50000)/(111.1*1000) #Radio externo es  2*h (profundidad del pozo) + 20 km
+# a3 = 0 #Altura
+# h3 = -32000 #Profundidad del cilindro de 16 km
+# x03=float(x_pozo_inv_plat)
+# y03=float(y_pozo_inv_plat)
 
-bcircles1p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='red', width=2),
-                        opacity =0.55, showlegend=False,
-                        name='Volumen monitoreo estado rojo')
+# #Efectuamos los calculos correspondientes  a la funcion
+# x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
+# x2, y2, z2 = cylinder(r2, h2,x02,y02, a=a2)
+# x3, y3, z3 = cylinder(r3, h3,x03,y03, a=a3)
 
-#Elaboramos la proyeccion para el volumen de monitoreo
-cyl2p = go.Surface(x=x2, y=y2, z=z2,
-                 colorscale = [[0, 'green'],[1, 'orange']],
-                 showscale=False,
-                 opacity=0.7,
-                 name='Volumen monitoreo para estado verde,amarillo y naranja')
+# #Elaboramos la proyeccion para el volumen de suspension
+# cyl1p = go.Surface(x=x1, y=y1, z=z1,
+#                  colorscale = [[0, 'red'],[1, 'red']],#El color se da porque aqui es donde se analizan los sismos 
+#                                                             #que pueden dar un alarma verde,amarilla o naranja
+#                  showscale=False,
+#                  opacity=0.5,
+#                  name='Volumen monitoreo estado rojo')
+# xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
+# xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
 
-xb_low, yb_low, zb_low = boundary_circle(r2, a2,x02,y02)
-xb_up, yb_up, zb_up = boundary_circle(r2,a2+h2,x02,y02)
+# bcircles1p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='red', width=2),
+#                         opacity =0.55, showlegend=False,
+#                         name='Volumen monitoreo estado rojo')
 
-#Bordes
-bcircles2p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='green', width=2),
-                        opacity =0.75, showlegend=False,
-                        name='Volumen monitoreo para estado verde,amarillo y naranja'
-                        )
+# #Elaboramos la proyeccion para el volumen de monitoreo
+# cyl2p = go.Surface(x=x2, y=y2, z=z2,
+#                  colorscale = [[0, 'green'],[1, 'orange']],
+#                  showscale=False,
+#                  opacity=0.7,
+#                  name='Volumen monitoreo para estado verde,amarillo y naranja')
 
-#Elaboramos la proyeccion para el cilindro de volumen externo
-cyl3p = go.Surface(x=x3, y=y3, z=z3,
-                 colorscale = [[0, 'aqua'],[1, 'aqua']],
-                 showscale=False,
-                 opacity=0.4,
-                 name='Volumen externo')
+# xb_low, yb_low, zb_low = boundary_circle(r2, a2,x02,y02)
+# xb_up, yb_up, zb_up = boundary_circle(r2,a2+h2,x02,y02)
 
-xb_low, yb_low, zb_low = boundary_circle(r3, a3,x03,y03)
-xb_up, yb_up, zb_up = boundary_circle(r3,a3+h3,x03,y03)
+# #Bordes
+# bcircles2p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='green', width=2),
+#                         opacity =0.75, showlegend=False,
+#                         name='Volumen monitoreo para estado verde,amarillo y naranja'
+#                         )
 
-#Bordes
-bcircles3p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
-                        y = yb_low.tolist()+[None]+yb_up.tolist(),
-                        z = zb_low.tolist()+[None]+zb_up.tolist(),
-                        mode ='lines',
-                        line = dict(color='blue', width=2),
-                        opacity =0.75, showlegend=False,
-                        name='Volumen externo'
-                        )
+# #Elaboramos la proyeccion para el cilindro de volumen externo
+# cyl3p = go.Surface(x=x3, y=y3, z=z3,
+#                  colorscale = [[0, 'aqua'],[1, 'aqua']],
+#                  showscale=False,
+#                  opacity=0.4,
+#                  name='Volumen externo')
+
+# xb_low, yb_low, zb_low = boundary_circle(r3, a3,x03,y03)
+# xb_up, yb_up, zb_up = boundary_circle(r3,a3+h3,x03,y03)
+
+# #Bordes
+# bcircles3p =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+#                         y = yb_low.tolist()+[None]+yb_up.tolist(),
+#                         z = zb_low.tolist()+[None]+zb_up.tolist(),
+#                         mode ='lines',
+#                         line = dict(color='blue', width=2),
+#                         opacity =0.75, showlegend=False,
+#                         name='Volumen externo'
+#                         )
 
 #Estaciones sismologicas
 df_sta_vmm=pd.read_csv('datasets/VMM_STA.csv',delimiter=';',decimal=',')
@@ -476,11 +484,8 @@ Real=geology('datasets/BASE_CUATERNARIO.txt','purple','pink','Tope Grupo Real')
 
 df_new=pd.read_csv('datasets/UN_CRN_COLORS.csv',index_col=None)
 
-# SISMICA=img_3d("assets/perfil_2.jpg",-76.2239,6.80483056000,-72.953083300,9.0807305600,4000,-15000)
-# SISMICA=img_3d("assets/perfil_2.jpg",-72.953083300,9.0807305600,-76.2239,6.80483056000,4000,-15000)
-# SISMICA=img_3d("assets/perfil_2.jpg",-76.2239,9.0807305600,-72.953083300,6.80483056000,4000,-15000)
+
 SISMICA=img_3d("assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
-# SISMICA=img_3d("assets/perfil_2.jpg",-72.954,6.806,-74.115,7.586,4000,-20000)
 
 #Texto de imagenes
 df_andina=pd.read_csv('datasets\Coordenadas_textos_perfil_trasandina.csv',delimiter=';')
@@ -495,7 +500,7 @@ for name,lon,lat,alt in zip(df_andina['texto'],df_andina['x'],df_andina['y'], df
             xshift=0,
             opacity=0.7,
             font=dict(
-                color="white",
+                color='white',
                 size=12
             ))
     txts_p.append(un)
@@ -574,7 +579,7 @@ card_main=dbc.Card(
                 html.H5("Punto 2 (Longitud-Latitud)", className="card-subtitle"),
                 dcc.Input(id="Longitud 2", type="number", placeholder="Longitud 2", min=loi, max=los, step=0.01,value=los,style={'marginRight':'10px'}),
                 dcc.Input(id="Latitud 2", type="number", placeholder="Latitud 2", min=lai, max=las, step=0.01,value=las,debounce=True),
-            html.H4("Variables de sismicidad:", className="card-subtitle"),
+            html.H4("Variables de sismicidad desplegadas:", className="card-subtitle"),
             dcc.Dropdown(id='SEISMO',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -590,15 +595,32 @@ card_main=dbc.Card(
                         multi=True
                     ),
             html.H4("________________________________________", className="card-subtitle"),
-            html.H4("Cartografía y linea base:", className="card-subtitle"),
+            html.H4("PPII:", className="card-subtitle"),
+            dcc.Dropdown(id='PPII',
+                        placeholder="Variables a desplegar...",
+                        style={'color': 'black'},
+                        options=[
+                            {'label': ' Pozo Kalé - Investigación (ANH)', 'value': 'KALEi'},
+                            {'label': ' Pozo Kalé - Inyector (ANH)', 'value': 'KALEy'},
+                            {'label': ' Pozo Kalé - Captador (ANH)', 'value': 'KALEc'},
+                            {'label': ' Pozo Platero - Investigación (ANH)', 'value': 'PLATEROi'},
+                            {'label': ' Pozo Platero - Inyector (ANH)', 'value': 'PLATEROy'},
+                            {'label': ' Pozo Platero - Captador (ANH)', 'value': 'PLATEROc'},
+                            
+                        ],
+                        value=[],
+                        multi=True
+                    ),
+            html.H4("________________________________________", className="card-subtitle"),
+            html.H4("Cartografía base:", className="card-subtitle"),
             dcc.Dropdown(id='CART',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
                         options=[
-                            {'label': ' Pozo Kalé (ANH)', 'value': 'KALE'},
-                            {'label': ' Cilindro en suspensión Semáforo sísmico para Kalé (SGC)', 'value': 'SEM_KALE'},
-                            {'label': ' Pozo Platero (ANH)', 'value': 'PLATERO'},
-                            {'label': ' Cilindro en suspensión Semáforo sísmico para Platero (SGC)', 'value': 'SEM_PLATERO'},
+                            #{'label': ' Pozo Kalé (ANH)', 'value': 'KALE'},
+                            #{'label': ' Cilindro en suspensión Semáforo sísmico para Kalé (SGC)', 'value': 'SEM_KALE'},
+                            #{'label': ' Pozo Platero (ANH)', 'value': 'PLATERO'},
+                            #{'label': ' Cilindro en suspensión Semáforo sísmico para Platero (SGC)', 'value': 'SEM_PLATERO'},
                             {'label': ' Barras de Error (SGC)', 'value': 'ERROR'},
                             {'label': ' Estaciones sismológicas (SGC)', 'value': 'STA'},
                             {'label': ' Poblaciones (UNAL-ANH-MINCIENCIAS)', 'value': 'POB'},
@@ -611,7 +633,7 @@ card_main=dbc.Card(
                         multi=True
                     ),
             html.H4("________________________________________", className="card-subtitle"),
-            html.H4("Información petrolífera y sísmica:", className="card-subtitle"),
+            html.H4("Información complementaria:", className="card-subtitle"),
             dcc.Dropdown(id='PETRO',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -627,7 +649,7 @@ card_main=dbc.Card(
                         value=[],
                         multi=True
                     ),
-            html.H4("Inyección de Agua:", className="card-subtitle"),
+            html.H4("Inyección de agua recobro mejorado:", className="card-subtitle"),
             dcc.Dropdown(id='INY',
                                     placeholder="Fecha inyeccion",
                                     style={'color': 'black'},
@@ -722,6 +744,7 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='MAGN', component_property='value'),
      dash.dependencies.Input(component_id='DEPTH', component_property='value'),
      dash.dependencies.Input(component_id='SEISMO', component_property='value'),
+     dash.dependencies.Input(component_id='PPII', component_property='value'),
      dash.dependencies.Input(component_id='CART', component_property='value'),
      dash.dependencies.Input(component_id='PETRO', component_property='value'),
      dash.dependencies.Input(component_id='INY', component_property='value'),
@@ -731,7 +754,7 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='Latitud 1', component_property='value'),
      dash.dependencies.Input(component_id='Latitud 2', component_property='value') ])
 
-def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,GEOL,x0,x1,y0,y1):
+def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,INY,GEOL,x0,x1,y0,y1):
         fig=go.Figure()
         if np.isin('GEO', GEOL):
             if TOPO==0:
@@ -764,6 +787,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
             err=False
         fig.add_trace(go.Scatter3d(
             x=df_sismos_1['LONGITUD (°)'],y=df_sismos_1['LATITUD (°)'],z=df_sismos_1['PROF. (m)'],mode='markers',
+            
             marker=dict(
                 size=(df_sismos_1['MAGNITUD'])**2,
                 color=df_sismos_1['PROF. (m)'],                # set color to an array/list of desired values
@@ -771,6 +795,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                 opacity=0.8,
                 cmax=df_sismos['PROF. (m)'].max(),
                 cmin=-32000,
+                #showscale=True,
+                #colorbar={"title": '<br>Profundidad del <br> sismo (m)'},
             ),
             error_x=dict(
                 array=df_sismos_1['ERROR LONGITUD (°)'],                # set color to an array/list of desired values
@@ -796,20 +822,34 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
             ),
             hovertemplate=text,
                 name='Sismos',
-                showlegend=False))
-        if np.isin('KALE', CART):
-            fig.add_trace(kale)
+                #showlegend=False
+                ))
+        # if np.isin('KALE', CART):
+        #     fig.add_trace(kale)
+        if np.isin('KALEi', PPII):
+            fig.add_traces([kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3])
+        if np.isin('KALEy', PPII):
+            fig.add_traces([kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3])
+        if np.isin('KALEc', PPII):
+            fig.add_trace(kalec)
+        if np.isin('PLATEROi', PPII):
+            fig.add_traces([plai,picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3])
+        if np.isin('PLATEROy', PPII):
+            fig.add_traces([play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3])
+        if np.isin('PLATEROc', PPII):
+            fig.add_trace(plac)
+
         if np.isin('RIV', CART):
             for i in df_rivers['DRENAJE'].unique():
                 riv=df_rivers[df_rivers['DRENAJE']==i]
                 fig.add_trace(go.Scatter3d(z=riv['Z'], x=riv['X'], y=riv['Y'],mode='markers',
                 name=str(i),marker_symbol='square',marker=dict(color='aqua',size=3)))
-        if np.isin('SEM_KALE', CART):
-            fig.add_traces(data=[cyl1, bcircles1,cyl2, bcircles2,cyl3,bcircles3])
-        if np.isin('PLATERO', CART):
-            fig.add_trace(platero)
-        if np.isin('SEM_PLATERO', CART):
-            fig.add_traces(data=[cyl1p, bcircles1p,cyl2p, bcircles2p,cyl3p,bcircles3p])
+        # if np.isin('SEM_KALE', CART):
+        #     fig.add_traces(data=[cyl1, bcircles1,cyl2, bcircles2,cyl3,bcircles3])
+        # if np.isin('PLATERO', CART):
+        #     fig.add_trace(platero)
+        # if np.isin('SEM_PLATERO', CART):
+        #     fig.add_traces(data=[cyl1p, bcircles1p,cyl2p, bcircles2p,cyl3p,bcircles3p])
         if np.isin('STA', CART):
             fig.add_trace(STA_VMM)
             fig.add_trace(STA_LOM)
@@ -820,18 +860,26 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                 hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
         if np.isin('POZO', PETRO):
             fig.add_trace(Pozos)
-        if len(INY)>1:
+        try:
             for i in iny['CAMPO']:
                     inyc=iny[iny['CAMPO']==i]
                     fig.add_trace(go.Scatter3d(x=[float(inyc['X'])]*2, y=[float(inyc['Y'])]*2, z=[0,-1*float(inyc['prof'])],
                                 hovertemplate=inyc['CAMPO'].apply(lambda x:str(x))+'<br>'
                                         'Pozos:'+inyc['POZOS'].apply(lambda x:str(x))+'<br>'
-                                        'BBL:'+inyc['TOTAL_bbl'].apply(lambda x:str(x)),mode='lines',name='Inyección BBL',line=dict(color=inyc[INY],width=20,colorscale='Jet',cmax=((iny[INY])).max(),
-
-                                cmin=((iny[INY])).min()),showlegend=False),)
+                                        'BBL:'+inyc[INY].apply(lambda x:str(x)),mode='lines',name='Inyección BBL',
+                                        line=dict(color=inyc[INY],
+                                    width=20,colorscale='Jet',
+                                cmax=((iny[INY])).max(),
+                                cmin=((iny[INY])).min(),
+                                #showscale=True,
+                                #colorbar={"title": 'Volumen de inyección (BBL)','x': 1.6}
+                                )
+                                ,showlegend=False),)
             fig.update_layout(
                 scene=dict(
                 annotations=inyec))
+        except:
+                pass
             # fig.add_trace(INYECCION)
         if np.isin('REZ', PETRO):
             fig.add_trace(rez)
@@ -906,6 +954,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                      sizeref=0.015,
                      showscale=False,
                      colorscale=['black','black']))
+
         fig.update_layout(
                 scene=dict(
                 annotations=[dict(
@@ -929,6 +978,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,CART,PETRO,INY,
                 yaxis = dict(title='Latitud(°)',nticks=10, range=[lai,las],),
                 zaxis = dict(title='Elevación(msnm)',nticks=10, range=[-32000,10000],),),)
         fig.update_traces(showlegend=False)
+        #fig.add_traces([kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3])
         return fig,START_DATE
 
 @app.callback(

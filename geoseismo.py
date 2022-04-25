@@ -39,6 +39,57 @@ def boundary_circle(r, h,x0,y0, nt=600):
     z = h*np.ones(theta.shape)
     return x, y, z
 
+def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
+    x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
+    cyl1 = go.Surface(x=x1, y=y1, z=z1,
+                    colorscale = col_cyl,
+                    showscale=False,
+                    opacity=opac,
+                    name=name)
+    xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
+    xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
+
+    bcircles1 =go.Scatter3d(x = xb_low.tolist()+[None]+xb_up.tolist(),
+                            y = yb_low.tolist()+[None]+yb_up.tolist(),
+                            z = zb_low.tolist()+[None]+zb_up.tolist(),
+                            mode ='lines',
+                            line = dict(color=col_cir, width=2),
+                            opacity =0.55, showlegend=False,
+                            name=name)
+    return cyl1,bcircles1
+
+def vol_sus(x_pozo_inv_kale, y_pozo_inv_kale,h_pozo_inv_kale_m,nam,c):
+        r_ext = 2*h_pozo_inv_kale_m+20000 #m
+        ppii= go.Scatter3d(
+        x=np.array(x_pozo_inv_kale),
+        y=np.array(y_pozo_inv_kale),
+        z=np.array(300),
+        mode='markers',
+        marker_symbol='diamond',
+        name=nam,
+        hovertemplate ="PPII",
+        marker=dict(
+        size=4,
+        color=c
+        ))
+
+        r1=r_ext-20000
+
+        #Volumen de suspension
+        cyl1,bcircles1=volumen_semaforo(r1/(111.1*1000) ,0,-16000,
+                x_pozo_inv_kale,y_pozo_inv_kale,0.5,
+                ['red','red'],'red','Suspensión')
+        #Volumen de monitoreo
+        cyl2,bcircles2=volumen_semaforo(r_ext/(111.1*1000),0,-16000,
+                x_pozo_inv_kale,y_pozo_inv_kale,0.7,
+                ['green','orange'],'green','Monitoreo')
+        #Volumen externo
+        cyl3,bcircles3=volumen_semaforo(50000/(111.1*1000),0,-32000,
+                x_pozo_inv_kale,y_pozo_inv_kale,0.3,
+                ['aqua','aqua'],'blue','Externo')
+                
+        return ppii,cyl1,bcircles1,cyl2,bcircles2,cyl3,bcircles3
+
 #Perfil geologico
 def geologic_profile(x0,y0,x1,y1,url,name,colr):
     df_geo=pd.read_csv(url,delimiter=';',usecols=[2,3,4],decimal=',')
@@ -98,7 +149,7 @@ def img_3d(url,x0,y0,x1,y1,z0,z1):
 #Plano de perfil de corte
 def profile_plane(x0,y0,x1,y1):
     yy = np.linspace(y0,y1, 3)
-    zz = np.linspace(-15000,4000, 3)
+    zz = np.linspace(-32000,10000, 3)
     yy, zz = np.meshgrid(yy, zz)
     x_data=list(np.linspace(x0,x1, 3))
     x_data=[x_data]*3
