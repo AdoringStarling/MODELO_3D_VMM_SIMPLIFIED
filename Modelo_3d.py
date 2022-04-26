@@ -20,6 +20,8 @@ df_topo   =df_topo[(df_topo[1]>lai)&(df_topo[1]<las)&(df_topo[0]>loi)&(df_topo[0
 mesh_topo = (df_topo.pivot(index=1, columns=0,values=2))
 z_topo,x_topo,y_topo=mesh_topo.values,mesh_topo.columns,mesh_topo.index
 
+topog=go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['black','black'],lighting=dict(ambient=0.3,diffuse=0.5),
+                    showlegend=False,opacity=1,name='Topografía')
 #Base de datos de sismos convertidos a csv desde http://bdrsnc.sgc.gov.co/paginas1/catalogo/Consulta_Valle_Medio/valle_medio.php
 #df_sismos=pd.read_csv("datasets/reporte_1.csv")#,delimiter=';',decimal=',')
 df_sismos=pd.read_csv(r'datasets\reporte_LBG.csv')
@@ -202,7 +204,8 @@ rez = go.Scatter3d(
     marker=dict(
         size=5,
         color='gray'
-    )
+    ),
+    showlegend=False
 )
 #Poblaciones
 df_poblaciones=pd.read_csv('datasets/poblaciones.csv',usecols=['Name','lon','lat','outputSRTM1'])
@@ -315,7 +318,8 @@ card_main=dbc.Card(
                 dbc.NavLink("Semáforo sísmico", href="https://pinguinodigital.com/wp-content/uploads/2020/08/pagina-en-construcci%C3%B3n1.jpg", active="exact"),
             ]),
             html.H2("Modelo Tridimensional de Sismicidad en el Valle Medio del Magdalena", className="card-title"),
-            html.H4("Transparencia de la superficie:", className="card-subtitle"),
+            html.H4("Transparencia:", className="card-subtitle"),
+            html.H5("Topografia:", className="card-subtitle"),
             dcc.Slider(
                 id='TOPO',
                 min=0,
@@ -323,6 +327,67 @@ card_main=dbc.Card(
                 step=0.1,
                 value=1,
                 tooltip={"placement": "bottom", "always_visible": True}),
+                #Condicionales de geologia-Tope Grupo real
+                html.Div(id='GREAL', children=[
+                        html.H5("Tope Grupo Real:", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Slider(id='TGREAL',
+                                min=0,
+                                max=1,
+                                step=0.1,
+                                value=1,
+                                tooltip={"placement": "bottom", "always_visible": False})
+
+                    ], style= {'display': 'none'}),
+                #Condicionales de geologia-Tope Grupo real
+                html.Div(id='COLORADO', children=[
+                        html.H5("Tope Formación Colorado:", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Slider(id='TCOLORADO',
+                                min=0,
+                                max=1,
+                                step=0.1,
+                                value=1,
+                                tooltip={"placement": "bottom", "always_visible": False})
+
+                    ], style= {'display': 'none'}),
+                #Condicionales de geologia-Tope Grupo real
+                html.Div(id='MUGROSA', children=[
+                        html.H5("Tope Formación Mugrosa:", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Slider(id='TMUGROSA',
+                                min=0,
+                                max=1,
+                                step=0.1,
+                                value=1,
+                                tooltip={"placement": "bottom", "always_visible": False})
+
+                    ], style= {'display': 'none'}),
+                #Condicionales de geologia-Tope Grupo real
+                html.Div(id='CHORROS', children=[
+                        html.H5("Tope Formación Chorros:", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Slider(id='TCHORROS',
+                                min=0,
+                                max=1,
+                                step=0.1,
+                                value=1,
+                                tooltip={"placement": "bottom", "always_visible": False})
+
+                    ], style= {'display': 'none'}),
+                #Condicionales de geologia-Tope Grupo real
+                html.Div(id='EOCMED', children=[
+                        html.H5("Discordancia del Eoceno Medio:", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Slider(id='TEOCMED',
+                                min=0,
+                                max=1,
+                                step=0.1,
+                                value=1,
+                                tooltip={"placement": "bottom", "always_visible": False})
+
+                    ], style= {'display': 'none'}),
+           #Fin condicionales
             html.H4("Exageración vertical:", className="card-subtitle"),
             dcc.Slider(
                 id='EXG',
@@ -385,9 +450,9 @@ card_main=dbc.Card(
                             {'label': 'Magnitud', 'value': 'MAG'},
                             {'label': 'RMS', 'value': 'RMS'},
                             {'label': 'Errores', 'value': 'ERR'},
-                            
+                            {'label': 'Mostrar sismicidad', 'value': 'SISM'}
                         ],
-                        value=['LOC', 'FEC','MAG','RMS','ERR'],
+                        value=['LOC', 'FEC','MAG','RMS','ERR','SISM'],
                         multi=True
                     ),
             html.H4("________________________________________", className="card-subtitle"),
@@ -413,10 +478,6 @@ card_main=dbc.Card(
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
                         options=[
-                            #{'label': ' Pozo Kalé (ANH)', 'value': 'KALE'},
-                            #{'label': ' Cilindro en suspensión Semáforo sísmico para Kalé (SGC)', 'value': 'SEM_KALE'},
-                            #{'label': ' Pozo Platero (ANH)', 'value': 'PLATERO'},
-                            #{'label': ' Cilindro en suspensión Semáforo sísmico para Platero (SGC)', 'value': 'SEM_PLATERO'},
                             {'label': ' Barras de Error (SGC)', 'value': 'ERROR'},
                             {'label': ' Estaciones sismológicas (SGC)', 'value': 'STA'},
                             {'label': ' Poblaciones (UNAL-ANH-MINCIENCIAS)', 'value': 'POB'},
@@ -529,7 +590,12 @@ app.layout = html.Div([
 
 @app.callback(
      [dash.dependencies.Output(component_id='3d_model', component_property='figure'),
-      dash.dependencies.Output(component_id='DATE', component_property='initial_visible_month')],
+      dash.dependencies.Output(component_id='DATE', component_property='initial_visible_month'),
+      dash.dependencies.Output(component_id='GREAL', component_property='style'),
+      dash.dependencies.Output(component_id='COLORADO', component_property='style'),
+      dash.dependencies.Output(component_id='MUGROSA', component_property='style'),
+      dash.dependencies.Output(component_id='CHORROS', component_property='style'),
+      dash.dependencies.Output(component_id='EOCMED', component_property='style')],
 
 
 
@@ -548,17 +614,26 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='Longitud 1', component_property='value'),
      dash.dependencies.Input(component_id='Longitud 2', component_property='value'),
      dash.dependencies.Input(component_id='Latitud 1', component_property='value'),
-     dash.dependencies.Input(component_id='Latitud 2', component_property='value') ])
+     dash.dependencies.Input(component_id='Latitud 2', component_property='value'),
+     dash.dependencies.Input(component_id='TGREAL', component_property='value'),
+     dash.dependencies.Input(component_id='TCOLORADO', component_property='value'),
+     dash.dependencies.Input(component_id='TMUGROSA', component_property='value'),
+     dash.dependencies.Input(component_id='TCHORROS', component_property='value'),
+     dash.dependencies.Input(component_id='TEOCMED', component_property='value') ])
 
-def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,INY,GEOL,x0,x1,y0,y1):
+def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,INY,GEOL,x0,x1,y0,y1,
+                        TGREAL,TCOLORADO,TMUGROSA,TCHORROS,TEOCMED):
         fig=go.Figure()
         if np.isin('GEO', GEOL):
             if TOPO==0:
                 DISM=0
             else:
                 DISM=0.01
-            fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['black','black'],lighting=dict(ambient=0.3,diffuse=0.5),
-                    showlegend=False,opacity=TOPO-DISM,name='Topografía'))
+            topog.colorscale=['black','black']
+            topog.opacity=TOPO-DISM
+            fig.add_trace(topog)
+            # fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['black','black'],lighting=dict(ambient=0.3,diffuse=0.5),
+            #         showlegend=False,opacity=TOPO-DISM,name='Topografía'))
             directory = 'datasets\CSV_UNIDADES'
             for filename in os.scandir(directory):
                 if filename.is_file():
@@ -571,12 +646,19 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                     fig.add_trace(geology_super(filename.path,np.array(df_1['Color'].apply(lambda x:str(x)))[0],name,text,TOPO))
             
         else:
-            fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow'],
-                    showlegend=False,opacity=TOPO,name='Topografía',lighting=dict(ambient=0.3,diffuse=0.5)))
+            topog.colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow']
+            topog.opacity=TOPO
+            fig.add_trace(topog)
+            # fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow'],
+            #         showlegend=False,opacity=TOPO,name='Topografía',lighting=dict(ambient=0.3,diffuse=0.5)))
         df_sismos_1=df_sismos[(df_sismos['FECHA - HORA UTC']<=END_DATE)&(df_sismos['FECHA - HORA UTC']>=START_DATE)&
         (df_sismos['MAGNITUD']>=MAGN[0])&(df_sismos['MAGNITUD']<=MAGN[1])
         &(df_sismos['PROF. (m)']>=DEPTH[0])&(df_sismos['PROF. (m)']<=DEPTH[1])]
         text=text_scatter(SEISMO,df_sismos_1)
+        if np.isin('SISM',SEISMO):
+            vis=True
+        else :
+            vis=False
         if np.isin('ERROR', CART):
             err=True
         else:
@@ -619,7 +701,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             ),
             hovertemplate=text,
                 name='Sismos',
-                showlegend=False
+                showlegend=False,
+                visible=vis
                 ))
         # if np.isin('KALE', CART):
         #     fig.add_trace(kale)
@@ -727,21 +810,42 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                                 mode='lines',
                                 name=tip,line=dict(color='red',width=4),showlegend=False),)
         if np.isin('REAL', GEOL):
+                Real.opacity=TGREAL
                 fig.add_trace(Real)
+                grealo={'display': 'block'}
+        else:
+            grealo={'display': 'none'}
+
         if np.isin('COL', GEOL):
+                Colorado.opacity=TCOLORADO
                 fig.add_trace(Colorado)
+                coloradoo={'display': 'block'}
+        else:
+            coloradoo={'display': 'none'}       
         if np.isin('MUG', GEOL):
+                Mugrosa.opacity=TMUGROSA
                 fig.add_trace(Mugrosa)
+                mugrosao={'display': 'block'}
+        else:
+            mugrosao={'display': 'none'}
         if np.isin('CHO', GEOL):
+                Chorros.opacity=TCHORROS
                 fig.add_trace(Chorros)
+                chorroso={'display': 'block'}
+        else:
+            chorroso={'display': 'none'}
         if np.isin('EOC', GEOL):
+                Eoceno.opacity=TEOCMED
                 fig.add_trace(Eoceno)
+                eocmedo={'display': 'block'}
+        else:
+            eocmedo={'display': 'none'}
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
         if np.isin('SEIS', PETRO):
                 fig.add_trace(SISMICA)
                 fig.update_layout(scene=dict(annotations=txts_p))
-        fig.add_trace(go.Cone(x=[-73.2], y=[8.5], z=[10000],
+        fig.add_trace(go.Cone(x=[-73.1], y=[8.8], z=[10000],
                       u=[0], v=[10], w=[0],
                      sizemode='scaled',
                      sizeref=0.015,
@@ -752,8 +856,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 scene=dict(
                 annotations=[dict(
                             showarrow=False,
-                            x=-73.3,
-                            y=8.5,
+                            x=-73.2,
+                            y=8.8,
                             z=10000,
                             text='N',
                             xanchor="left",
@@ -770,7 +874,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 xaxis = dict(title='Longitud(°)',nticks=10, range=[loi,los]),
                 yaxis = dict(title='Latitud(°)',nticks=10, range=[lai,las],),
                 zaxis = dict(title='Elevación(msnm)',nticks=10, range=[-32000,10000],),),)
-        return fig,START_DATE
+
+        return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo
 
 @app.callback(
      dash.dependencies.Output(component_id='Model_profile', component_property='figure'),
