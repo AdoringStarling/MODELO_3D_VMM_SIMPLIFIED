@@ -130,6 +130,8 @@ def geologic_profile(x0,y0,x1,y1,url,name,colr):
     fig_1 = go.Scatter(x=d, y=z,
                     mode='lines',
                     name=name,
+                    hovertext=name,
+                    hoverinfo='text',
                     line=dict(color=colr, width=2))
     return fig_1
 #Imagen sismica
@@ -154,7 +156,7 @@ def profile_plane(x0,y0,x1,y1):
     x_data=list(np.linspace(x0,x1, 3))
     x_data=[x_data]*3
     xx=np.concatenate(x_data).reshape(yy.shape)
-    ima_surface=go.Surface(x=xx, y=yy, z=zz, colorscale=['red','red'], showscale=False,opacity=0.5,name='Perfil')
+    ima_surface=go.Surface(x=xx, y=yy, z=zz, colorscale=['red','red'], showscale=False,opacity=0.5,name='Perfil',hoverinfo='none')
     return ima_surface
 
 
@@ -191,6 +193,12 @@ def profile(x1,x2,y1,y2,df_sismos_1):
     p2_s=rotate(o2, (x2+0.1,y2), -rot)
     p2_i=rotate(o2, (x2-0.1,y2), -rot)
     polygon = Polygon([p1_s, p1_i, p2_i, p2_s])
+    if y1==y2:
+        polygon = Polygon([(x1,y1+0.1), (x1,y1-0.1), (x2,y1+0.1), (x2,y1+0.1)])
+    elif x1==x2:
+        polygon = Polygon([(x1+0.1,y1), (x1-0.1,y1), (x1+0.1,y2), (x1-0.1,y2)])
+    else:
+        pass
     id_ls=[]
     for x,y,id in zip(df_sismos_1[ 'LONGITUD (°)'],df_sismos_1[ 'LATITUD (°)'],df_sismos_1['Unnamed: 0']):
         if polygon.contains(Point(x,y)):

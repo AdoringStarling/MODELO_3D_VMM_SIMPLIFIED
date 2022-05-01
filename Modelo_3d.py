@@ -723,7 +723,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             for i in df_rivers['DRENAJE'].unique():
                 riv=df_rivers[df_rivers['DRENAJE']==i]
                 fig.add_trace(go.Scatter3d(z=riv['Z'], x=riv['X'], y=riv['Y'],mode='markers',
-                name=str(i),marker_symbol='square',marker=dict(color='aqua',size=3),showlegend=False))
+                name=str(i),marker_symbol='square',marker=dict(color='aqua',size=3),showlegend=False,hovertemplate=str(i)))
         if np.isin('STA', CART):
             fig.add_trace(STA_VMM)
             fig.add_trace(STA_LOM)
@@ -850,7 +850,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                      sizemode='scaled',
                      sizeref=0.015,
                      showscale=False,
-                     colorscale=['black','black']))
+                     colorscale=['black','black'],
+                     hoverinfo='none'))
 
         fig.update_layout(
                 scene=dict(
@@ -921,6 +922,8 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
                                             hovertemplate=text1)
     seismic_scale=go.Scatter(x=[dist_max/25,dist_max*1.2/25,dist_max*1.5/25,dist_max*2/25,dist_max*2.6/25],
                                 y=[8000]*5,
+                                 hoverinfo='text',
+                                hovertext=np.array(['1','2','3','4','5']),
                                 mode='markers',
                                 name='Magnitudes',
                                 showlegend=False,
@@ -928,7 +931,7 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
                                             opacity=0.8,
                                             ))
     for x_t,t_t in zip([dist_max/25,dist_max*1.2/25,dist_max*1.5/25,dist_max*2/25,dist_max*2.6/25],['1','2','3','4','5']):
-        fig2.add_annotation(x=x_t, y=12200,
+        fig2.add_annotation(x=x_t, y=12200,hovertext=t_t,
             text=t_t,
             showarrow=False,
             yshift=0,
@@ -945,7 +948,7 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
         scale_num=10;scale_text='10';scale_size=12
     else :
         scale_num=5;scale_text='5';scale_size=12
-    fig2.add_annotation(x=(scale_num/111.1)/2, y=-38000,
+    fig2.add_annotation(x=(scale_num/111.1)/2, y=-38000,hovertext=scale_text+' km',
                 text=scale_text+'km',
                 showarrow=False,
                 yshift=0,
@@ -955,26 +958,36 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
                 
                 ))
     fig2.add_trace(go.Scatter(x=np.linspace(0, scale_num/111.1, 4), y=np.array([-40000]*4),
+                hovertext='Escala',
                 mode='lines',
                 name=scale_text+'km',
                 showlegend=False,
+                hoverinfo='text',
                 marker=dict(color='black', size=8)))
     fig2.add_trace(go.Scatter(x=np.linspace(scale_num/111.1, scale_num*2/111.1, 4), y=np.array([-40000]*4),
+                hovertext='Escala',
                 mode='lines',
+                hoverinfo='text',
                 name=scale_text+'km',
                 showlegend=False,
                 marker=dict(color='white', size=8)))
     fig2.add_trace(go.Scatter(x=np.linspace(scale_num*2/111.1, scale_num*3/111.1, 4), y=np.array([-40000]*4),
+                hovertext='Escala',
                 mode='lines',
+                hoverinfo='text',
                 name=scale_text+'km',
                 showlegend=False,
                 marker=dict(color='black', size=8)))
     fig2.add_trace(go.Scatter(x=np.linspace(scale_num*3/111.1, scale_num*4/111.1, 4), y=np.array([-40000]*4),
+                hovertext='Escala',
+                hoverinfo='text',
                 mode='lines',
                 name=scale_text+'km',
                 showlegend=False,
                 marker=dict(color='white', size=8)))
     fig2.add_trace(go.Scatter(x=np.linspace(scale_num*4/111.1, scale_num*5/111.1, 4), y=np.array([-40000]*4),
+                hovertext='Escala',
+                hoverinfo='text',
                 mode='lines',
                 name=scale_text+'km',
                 showlegend=False,
