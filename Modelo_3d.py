@@ -6,6 +6,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
 import os
+from plotly.subplots import make_subplots
+
 from geoseismo import *
 #Area del estudio
 los=-73
@@ -499,21 +501,27 @@ card_main=dbc.Card(
                             {'label': ' Campos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'FIELD'},
                             {'label': ' Trazo en superficie de líneas sísmicas (UNAL-ANH-MINCIENCIAS)', 'value': 'LIN'},
                             {'label': ' Rezumaderos (ANH)', 'value': 'REZ'},
-                            {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS'}
-
+                            {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS'},
+                            {'label': ' Inyección de agua', 'value': 'H2O'}
                             
                         ],
                         value=[],
                         multi=True
                     ),
-            html.H4("Inyección de agua recobro mejorado:", className="card-subtitle"),
-            dcc.Dropdown(id='INY',
-                                    placeholder="Fecha inyeccion",
+#------------Condicional campos--------
+                html.Div(id='INY', children=[
+                        html.H5("Campos (inyección de agua para recobro mejorado):", className="card-subtitle"),
+                        # Create element to hide/show, in this case a slider
+                        dcc.Dropdown(id='TINY',
+                                    placeholder="Campo",
                                     style={'color': 'black'},
-                                    options=[{'label':x,'value':x} for x in iny.columns[6:]],
-                                    value=[],
+                                    options=[{'label':x,'value':x} for x in iny['CAMPO']],
+                                    value='LA CIRA',
                                     multi=False
-                                ),
+                                )
+
+                    ], style= {'display': 'none'}),
+#----------------------------------
             html.H4("________________________________________", className="card-subtitle"),
             html.H4("Geología:", className="card-subtitle"),
             dcc.Dropdown(id='GEOL',
@@ -595,7 +603,8 @@ app.layout = html.Div([
       dash.dependencies.Output(component_id='COLORADO', component_property='style'),
       dash.dependencies.Output(component_id='MUGROSA', component_property='style'),
       dash.dependencies.Output(component_id='CHORROS', component_property='style'),
-      dash.dependencies.Output(component_id='EOCMED', component_property='style')],
+      dash.dependencies.Output(component_id='EOCMED', component_property='style'),
+      dash.dependencies.Output(component_id='INY', component_property='style')],
 
 
 
@@ -609,7 +618,6 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='PPII', component_property='value'),
      dash.dependencies.Input(component_id='CART', component_property='value'),
      dash.dependencies.Input(component_id='PETRO', component_property='value'),
-     dash.dependencies.Input(component_id='INY', component_property='value'),
      dash.dependencies.Input(component_id='GEOL', component_property='value'),
      dash.dependencies.Input(component_id='Longitud 1', component_property='value'),
      dash.dependencies.Input(component_id='Longitud 2', component_property='value'),
@@ -619,11 +627,51 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='TCOLORADO', component_property='value'),
      dash.dependencies.Input(component_id='TMUGROSA', component_property='value'),
      dash.dependencies.Input(component_id='TCHORROS', component_property='value'),
-     dash.dependencies.Input(component_id='TEOCMED', component_property='value') ])
+     dash.dependencies.Input(component_id='TEOCMED', component_property='value'),
+     dash.dependencies.Input(component_id='TINY', component_property='value') ])
 
-def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,INY,GEOL,x0,x1,y0,y1,
-                        TGREAL,TCOLORADO,TMUGROSA,TCHORROS,TEOCMED):
-        fig=go.Figure()
+def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,GEOL,x0,x1,y0,y1,
+                        TGREAL,TCOLORADO,TMUGROSA,TCHORROS,TEOCMED,TINY):
+        sub=None
+        if np.isin('H2O', PETRO):
+            fig=go.Figure()
+            name_campo=TINY
+            INYO={'display': 'block'}
+            fig = make_subplots(
+                rows=2, cols=2,
+                column_widths=[0.5, 0.5],
+                row_heights=[0.7, 0.3],
+                specs=[[{"type": "surface", "colspan": 2}, None],
+                    [{"type": "scatter"}, {"type": "bar"}]],
+                subplot_titles=(None, 'Volumenes de agua (bbl) -'+name_campo, "Total por año" ,'Volumenes de agua (bbl) -'+name_campo),
+                vertical_spacing=0.02)
+            months=[]
+            datos_iny = pd.read_csv("datasets\inyeccion_geo.csv", delimiter = ';')
+            for i in datos_iny.columns:
+                if '-' in i:
+                    months.append(i)
+            iny_df=datos_iny[datos_iny['CAMPO']==name_campo]
+            fig.add_trace(
+                go.Scatter(x=months,y=[float(np.array(iny_df[x])[0]) for x in months],name=name_campo,showlegend=False),
+                row=2, col=1
+            )
+            años=np.arange(2017,2022)
+            old=np.array([0,0,0,0,0])
+            for i in datos_iny['CAMPO']:
+                if i!='TOTAL':
+                    campiny=datos_iny[datos_iny['CAMPO']==i]
+                    new=[float(np.array(campiny[age])[0]) for age in años.astype(str)]
+                    fig.add_trace(
+                        go.Bar(name=i, x=años, y=new+old,hovertemplate=['bbl:'+str(x) for x in new],showlegend=False),row=2, col=2)
+                    old=new
+            fig.update_layout(barmode='stack')
+            fig.update_yaxes(tickvals=np.arange(0,300000000+1,50000000),row=2, col=2)
+            fig.update_xaxes(tickvals=años,row=2, col=2)
+            fig.update_xaxes(tickangle=45)
+            sub=1
+        else:
+            fig=go.Figure()
+            INYO={'display': 'none'}
         if np.isin('GEO', GEOL):
             if TOPO==0:
                 DISM=0
@@ -631,9 +679,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 DISM=0.01
             topog.colorscale=['black','black']
             topog.opacity=TOPO-DISM
-            fig.add_trace(topog)
-            # fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['black','black'],lighting=dict(ambient=0.3,diffuse=0.5),
-            #         showlegend=False,opacity=TOPO-DISM,name='Topografía'))
+            fig.add_trace(topog,row=sub,col=sub)
             directory = 'datasets\CSV_UNIDADES'
             for filename in os.scandir(directory):
                 if filename.is_file():
@@ -648,7 +694,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
         else:
             topog.colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow']
             topog.opacity=TOPO
-            fig.add_trace(topog)
+            fig.add_trace(topog,row=sub,col=sub)
             # fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow'],
             #         showlegend=False,opacity=TOPO,name='Topografía',lighting=dict(ambient=0.3,diffuse=0.5)))
         df_sismos_1=df_sismos[(df_sismos['FECHA - HORA UTC']<=END_DATE)&(df_sismos['FECHA - HORA UTC']>=START_DATE)&
@@ -673,9 +719,9 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 opacity=0.8,
                 cmax=df_sismos['PROF. (m)'].max(),
                 cmin=-32000,
-                showscale=True,
-                colorbar={"title": 'Profundidad del <br> sismo (m)',
-                    "orientation": 'h'},
+                #showscale=True,
+                #colorbar={"title": 'Profundidad del <br> sismo (m)',
+                #    "orientation": 'h'},
             ),
             error_x=dict(
                 array=df_sismos_1['ERROR LONGITUD (°)'],                # set color to an array/list of desired values
@@ -703,7 +749,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 name='Sismos',
                 showlegend=False,
                 visible=vis
-                ))
+                ),row=sub,col=sub)
         # if np.isin('KALE', CART):
         #     fig.add_trace(kale)
         if np.isin('KALEi', PPII):
@@ -734,29 +780,28 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
         if np.isin('POZO', PETRO):
             fig.add_trace(Pozos)
-        ls_form=[False]*len(iny['CAMPO'])
-        ls_form[-1]=True
-        try:
-            for i,cond in zip(iny['CAMPO'],ls_form):
-                    inyc=iny[iny['CAMPO']==i]
-                    fig.add_trace(go.Scatter3d(x=[float(inyc['X'])]*2, y=[float(inyc['Y'])]*2, z=[0,-1*float(inyc['prof'])],
-                                hovertemplate=inyc['CAMPO'].apply(lambda x:str(x))+'<br>'
-                                        'Pozos:'+inyc['POZOS'].apply(lambda x:str(x))+'<br>'
-                                        'BBL:'+inyc[INY].apply(lambda x:str(x)),mode='lines',name='Inyección BBL',
-                                        line=dict(color=inyc[INY],
-                                    width=20,colorscale='Jet',
-                                cmax=((iny[INY])).max(),
-                                cmin=((iny[INY])).min(),
-                                showscale=cond,
-                                colorbar={"title": 'Volumen de <br>inyección (BBL)','x': 1.25}
-                                )
-                                ,showlegend=False),)
-            fig.update_layout(
-                scene=dict(
-                annotations=inyec))
-        except:
-                pass
-            # fig.add_trace(INYECCION)
+        # ls_form=[False]*len(iny['CAMPO'])
+        # ls_form[-1]=True
+        # try:
+        #     for i,cond in zip(iny['CAMPO'],ls_form):
+        #             inyc=iny[iny['CAMPO']==i]
+        #             fig.add_trace(go.Scatter3d(x=[float(inyc['X'])]*2, y=[float(inyc['Y'])]*2, z=[0,-1*float(inyc['prof'])],
+        #                         hovertemplate=inyc['CAMPO'].apply(lambda x:str(x))+'<br>'
+        #                                 'Pozos:'+inyc['POZOS'].apply(lambda x:str(x))+'<br>'
+        #                                 'BBL:'+inyc[INY].apply(lambda x:str(x)),mode='lines',name='Inyección BBL',
+        #                                 line=dict(color=inyc[INY],
+        #                             width=20,colorscale='Jet',
+        #                         cmax=((iny[INY])).max(),
+        #                         cmin=((iny[INY])).min(),
+        #                         #showscale=cond,
+        #                         #colorbar={"title": 'Volumen de <br>inyección (BBL)','x': 1.25}
+        #                         )
+        #                         ,showlegend=False),)
+        #     fig.update_layout(
+        #         scene=dict(
+        #         annotations=inyec))
+        # except:
+        #         pass
         if np.isin('REZ', PETRO):
             fig.add_trace(rez)
         if np.isin('POB', CART):
@@ -869,14 +914,15 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                                 size=20))]))
         fig.update_layout(autosize=False,
                         width=850, height=1200,
-                        margin=dict(l=50, r=50, b=50, t=50),)
+                        #margin=dict(l=50, r=50, b=50, t=50),
+                        )
         fig.update_layout(
         scene = dict(aspectratio=dict(x=1,y=1.785714286,z=(42000/155540)*EXG),
                 xaxis = dict(title='Longitud(°)',nticks=10, range=[loi,los]),
                 yaxis = dict(title='Latitud(°)',nticks=10, range=[lai,las],),
                 zaxis = dict(title='Elevación(msnm)',nticks=10, range=[-32000,10000],),),)
 
-        return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo
+        return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo,INYO
 
 @app.callback(
      dash.dependencies.Output(component_id='Model_profile', component_property='figure'),
