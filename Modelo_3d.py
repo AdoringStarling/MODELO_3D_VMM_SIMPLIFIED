@@ -517,7 +517,8 @@ card_main=dbc.Card(
                                     style={'color': 'black'},
                                     options=[{'label':x,'value':x} for x in iny['CAMPO']],
                                     value='LA CIRA',
-                                    multi=False
+                                    multi=False,
+                                    clearable=False
                                 )
 
                     ], style= {'display': 'none'}),
