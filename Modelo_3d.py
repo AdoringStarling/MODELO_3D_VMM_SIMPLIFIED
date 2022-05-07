@@ -89,7 +89,7 @@ for name,lon,lat,alt in zip(iny['CAMPO'].apply(lambda x:str(x)),iny['X'],iny['Y'
             xshift=10,
             opacity=0.7,
             font=dict(
-                color="black",
+                color="white",
                 size=12
             ))
     inyec.append(un)
@@ -238,7 +238,7 @@ df_poblaciones['lat'],df_poblaciones['outputSRTM1']):
             xshift=10,
             opacity=0.7,
             font=dict(
-                color="black",
+                color="white",
                 size=12
             ))
     Pobl.append(un)
@@ -286,7 +286,7 @@ Real=geology('datasets/BASE_CUATERNARIO.txt','purple','pink','Tope Grupo Real')
 df_new=pd.read_csv('datasets/UN_CRN_COLORS.csv',index_col=None)
 
 
-SISMICA=img_3d("assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
+SISMICA=img_3d("ANH-TR-2006-04-A","assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
 
 #Texto de imagenes
 df_andina=pd.read_csv('datasets\Coordenadas_textos_perfil_trasandina.csv',delimiter=';')
@@ -809,7 +809,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 fig.add_trace(Poblaciones)
                 fig.update_layout(
                 scene=dict(
-                annotations=Pobl))
+                annotations=Pobl),
+                overwrite=False)
         if np.isin('FIELD', PETRO):
             for i in campet['LINE_ID'].unique():
                 f=campet[campet['LINE_ID']==i]
@@ -823,6 +824,10 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                                 hovertemplate=nom,
                                 mode='lines',
                                 name=tip,line=dict(color='black',width=3),showlegend=False),)
+                fig.update_layout(
+                        scene=dict(
+                        annotations=inyec),
+                overwrite=False)
         if np.isin('LIN', PETRO):
             for i in linsis['LINE_ID'].unique():
                 f=linsis[linsis['LINE_ID']==i]
@@ -890,7 +895,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
         if np.isin('SEIS', PETRO):
                 fig.add_trace(SISMICA)
-                fig.update_layout(scene=dict(annotations=txts_p))
+                fig.update_layout(scene=dict(annotations=txts_p),
+                overwrite=False)
         fig.add_trace(go.Cone(x=[-73.1], y=[8.8], z=[10000],
                       u=[0], v=[10], w=[0],
                      sizemode='scaled',
@@ -899,20 +905,20 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                      colorscale=['black','black'],
                      hoverinfo='none'))
 
-        fig.update_layout(
-                scene=dict(
-                annotations=[dict(
-                            showarrow=False,
-                            x=-73.2,
-                            y=8.8,
-                            z=10000,
-                            text='N',
-                            xanchor="left",
-                            xshift=0,
-                            opacity=1,
-                            font=dict(
-                                color="black",
-                                size=20))]))
+        # fig.update_layout(
+        #         scene=dict(
+        #         annotations=[dict(
+        #                     showarrow=False,
+        #                     x=-73.2,
+        #                     y=8.8,
+        #                     z=10000,
+        #                     text='N',
+        #                     xanchor="left",
+        #                     xshift=0,
+        #                     opacity=1,
+        #                     font=dict(
+        #                         color="black",
+        #                         size=20))]))
         fig.update_layout(autosize=False,
                         width=850, height=1200,
                         #margin=dict(l=50, r=50, b=50, t=50),

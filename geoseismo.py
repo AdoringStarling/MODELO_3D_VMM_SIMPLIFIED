@@ -135,7 +135,7 @@ def geologic_profile(x0,y0,x1,y1,url,name,colr):
                     line=dict(color=colr, width=2))
     return fig_1
 #Imagen sismica
-def img_3d(url,x0,y0,x1,y1,z0,z1):
+def img_3d(nam,url,x0,y0,x1,y1,z0,z1):
     image = sio.imread (url)
     zs,xys,_=image.shape
     zs,xys=int(zs),int(xys)
@@ -146,7 +146,7 @@ def img_3d(url,x0,y0,x1,y1,z0,z1):
     x_data=[x_data]*zs
     xx=np.concatenate(x_data).reshape(yy.shape)
     img = image[:,:, 1]
-    ima_surface=go.Surface(x=xx, y=yy, z=zz, surfacecolor= np.flipud(img), colorscale='greys', showscale=False)
+    ima_surface=go.Surface(name=str(nam),x=xx, y=yy, z=zz, surfacecolor= np.flipud(img), colorscale='greys', showscale=False)
     return ima_surface
 #Plano de perfil de corte
 def profile_plane(x0,y0,x1,y1):
