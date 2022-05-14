@@ -309,7 +309,9 @@ for name,lon,lat,alt in zip(df_andina['texto'],df_andina['x'],df_andina['y'], df
 
 #exp = open("datasets\Explicacion_modelo3d.txt", "r")
 exp=io.open("datasets\Explicacion_modelo3d.txt", mode="r", encoding="utf-8")
-exp=exp.read().splitlines()
+ls_k=[html.H2('¿Cómo funciona el modelo tridimensional del Valle Medio del Magdalena?', className="card-text")]
+for i in exp:
+    ls_k.append(html.H6(i, className="card-text"))
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 app.config['suppress_callback_exceptions'] = True
@@ -572,10 +574,9 @@ card_iny_graph = dbc.Card(
         dcc.Graph(id='Iny_graph', figure={}), body=True,color="dark",
 )
 
-card_references=dbc.Card(
-    dbc.CardBody([
-        html.H2("Explicacion del Modelo 3d", className="card-title"),
-        html.H6(exp, className="card-text"),
+references=[
+        # html.H2("Explicacion del Modelo 3d", className="card-title"),
+        # html.H6(exp, className="card-text"),
         html.H2("Referencias", className="card-title"),
         html.H6("Agencia Nacional de Hidrocarburos - ANH & Servicio Geológico Colombiano - SGC (2016). Informe final del Convenio interadministrativo 194 ANH-014 SGC, entre la Agencia Nacional de Hidrocarburos y el Servicio Geológico Colombiano.", 
             className="card-text"),
@@ -595,7 +596,13 @@ card_references=dbc.Card(
             className="card-text"),
          html.H6("Tozer, B, Sandwell, D. T., Smith, W. H. F., Olson, C., Beale, J. R., & Wessel, P. (2019). Global bathymetry and topography at 15 arc sec: SRTM15+. Distributed by OpenTopography. https://doi.org/10.5069/G92R3PT9. Accessed: 2022-02-10", 
             className="card-text"),
-    ]))
+    ]
+
+ls_k.extend(references)
+
+card_references=dbc.Card(
+    dbc.CardBody(ls_k
+    ))
 
 app.layout = html.Div([
     dbc.Row([dbc.Col(card_main, width=4),

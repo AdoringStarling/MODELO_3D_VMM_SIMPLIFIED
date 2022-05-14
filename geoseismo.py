@@ -255,7 +255,7 @@ def lin_list(url):
 def geology(url,color_min,color_max,name_geo):
     df_geo=pd.read_csv(url,delimiter=';',usecols=[1,2,3],decimal=',')
     df_geo.columns = ['Z', 'X', 'Y']
-    df_geo=df_geo[df_geo['Z']<0]
+    # df_geo=df_geo[df_geo['Z']<0]
     mesh_geo=df_geo.pivot(index='Y', columns='X',values='Z')
     geology=go.Surface(z=mesh_geo.values,showscale=False, x=mesh_geo.columns, y=mesh_geo.index,showlegend=False,opacity=0.9,colorscale=[color_max,color_min],name=name_geo)
     return geology
