@@ -1,0 +1,18 @@
+¿Cómo funciona el modelo tridimensional del Valle Medio del Magdalena?\n
+
+Se cuenta con un panel derecho de visualización tridimensional del modelo, un panel izquierdo de selección de información a desplegar y un panel inferior que permite visualizar información en vista de perfil a partir de coordenadas dentro del modelo tridimensional.\n
+
+El modelo permite visualizar en un espacio de tres dimensiones los datos e información que se enmarcan dentro de la región del Valle Medio del Magdalena, relacionados con la localización del los Proyectos Piloto de Investigación Integral (PPII). La información se enmarca dentro de un volumen entre las coordenadas de latitud 9° N y 6.5° S, longitud 73° W y 74.4° W; y elevación entre -32000 y 10000 metros sobre el nivel del mar (msnm).\n
+
+El modelo contiene una capa de topografía con datos de elevación con resolución espacial de 15 arcosegundos (450 m aproximadamente), con opción de ajuste de la exageración vertical. Además se presentan datos de sismicidad con su localización en las tres coordenadas, de los que se pueden desplegar diferentes variables asociadas a cada evento. Entre otras cosas que permite el modelo son:\n
+- Desplegar las coordenadas de los pozos de los PPII con sus respectivos cilindros externo, monitoreo y suspensión, contemplados para el semáforo sísmico.\n
+- Desplegar capas de cartografía base como son estaciones sismológicas, drenajes, poblaciones y vías.\n
+- Desplegar otro tipo de información complementaria, por ejmeplo relacionada con la industria petrolera.\n
+- Desplegar datos de inyección de agua para recobro mejorado en campos del Valle Medio del Magdalena .\n
+- Información de geología tanto superficial con en el subsuelo a partir de superficies tridimensionales interpretadas a partir de información sísmica.\n
+
+
+
+ 
+
+

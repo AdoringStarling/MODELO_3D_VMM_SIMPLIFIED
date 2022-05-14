@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import numpy as np
 import os
 from plotly.subplots import make_subplots
+import io
 
 from geoseismo import *
 #Area del estudio
@@ -23,7 +24,7 @@ mesh_topo = (df_topo.pivot(index=1, columns=0,values=2))
 z_topo,x_topo,y_topo=mesh_topo.values,mesh_topo.columns,mesh_topo.index
 
 topog=go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['black','black'],lighting=dict(ambient=0.3,diffuse=0.5),
-                    showlegend=False,opacity=1,name='Topografía')
+                    showlegend=False,opacity=1,name='Topografía',hoverinfo='none')
 #Base de datos de sismos convertidos a csv desde http://bdrsnc.sgc.gov.co/paginas1/catalogo/Consulta_Valle_Medio/valle_medio.php
 #df_sismos=pd.read_csv("datasets/reporte_1.csv")#,delimiter=';',decimal=',')
 df_sismos=pd.read_csv(r'datasets\reporte_LBG.csv')
@@ -306,6 +307,9 @@ for name,lon,lat,alt in zip(df_andina['texto'],df_andina['x'],df_andina['y'], df
             ))
     txts_p.append(un)
 
+#exp = open("datasets\Explicacion_modelo3d.txt", "r")
+exp=io.open("datasets\Explicacion_modelo3d.txt", mode="r", encoding="utf-8")
+exp=exp.read().splitlines()
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
 app.config['suppress_callback_exceptions'] = True
@@ -564,8 +568,14 @@ card_graph_profile = dbc.Card(
         dcc.Graph(id='Model_profile', figure={}), body=True,color="dark",
 )
 
+card_iny_graph = dbc.Card(
+        dcc.Graph(id='Iny_graph', figure={}), body=True,color="dark",
+)
+
 card_references=dbc.Card(
     dbc.CardBody([
+        html.H2("Explicacion del Modelo 3d", className="card-title"),
+        html.H6(exp, className="card-text"),
         html.H2("Referencias", className="card-title"),
         html.H6("Agencia Nacional de Hidrocarburos - ANH & Servicio Geológico Colombiano - SGC (2016). Informe final del Convenio interadministrativo 194 ANH-014 SGC, entre la Agencia Nacional de Hidrocarburos y el Servicio Geológico Colombiano.", 
             className="card-text"),
@@ -591,6 +601,7 @@ app.layout = html.Div([
     dbc.Row([dbc.Col(card_main, width=4),
              dbc.Col(card_graph, width=8),
              dbc.Col(card_graph_profile, width=12),
+             dbc.Col(card_iny_graph, width=12),
              dbc.Col(card_references, width=12)], 
              justify="start"), 
              
@@ -605,7 +616,8 @@ app.layout = html.Div([
       dash.dependencies.Output(component_id='MUGROSA', component_property='style'),
       dash.dependencies.Output(component_id='CHORROS', component_property='style'),
       dash.dependencies.Output(component_id='EOCMED', component_property='style'),
-      dash.dependencies.Output(component_id='INY', component_property='style')],
+      dash.dependencies.Output(component_id='INY', component_property='style')
+      ],
 
 
 
@@ -629,28 +641,17 @@ app.layout = html.Div([
      dash.dependencies.Input(component_id='TMUGROSA', component_property='value'),
      dash.dependencies.Input(component_id='TCHORROS', component_property='value'),
      dash.dependencies.Input(component_id='TEOCMED', component_property='value'),
-     dash.dependencies.Input(component_id='TINY', component_property='value') ,
-     dash.dependencies.Input(component_id='3d_model', component_property='clickData'),
      ])
 
 def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO,GEOL,x0,x1,y0,y1,
-                        TGREAL,TCOLORADO,TMUGROSA,TCHORROS,TEOCMED,TINY,clickData):
+                        TGREAL,TCOLORADO,TMUGROSA,TCHORROS,TEOCMED):
         sub=None
+        fig=go.Figure()
+        
         if np.isin('H2O', PETRO):
-            fig=go.Figure()
-            datos_iny = pd.read_csv("datasets\inyeccion_geo.csv", delimiter = ';')
-            name_campo=TINY
             INYO={'display': 'block'}
-            fig = make_subplots(
-                rows=2, cols=2,
-                column_widths=[0.5, 0.5],
-                row_heights=[0.6, 0.4],
-                specs=[[{"type": "surface", "colspan": 2}, None],
-                    [{"type": "scatter"}, {"type": "bar"}]],
-                subplot_titles=('1', '2','3','4'),
-                vertical_spacing=0.1)
-                
-            sub=1
+            iny=pd.read_csv(r'datasets\inyeccion_geo.csv',delimiter=';',decimal=',')
+            iny=iny[:-1]
             ls_form=[False]*len(iny['CAMPO'])
             ls_form[-1]=True
             # try:
@@ -668,47 +669,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                                 #colorbar={"title": 'Volumen de <br>inyección (BBL)','x': 1.25}
                                 )
                                 ,showlegend=False),)
-            try:
-                curve_number=(clickData['points'][0])['curveNumber']
-                curve_number=int(curve_number)
-                print(curve_number)
-                name_campo=(fig['data'][curve_number])['name']
-                print(name_campo)
-            except:
-                pass
-            names = {'1':None, '2':'Volumenes de agua (bbl) -'+name_campo, '3':"Total por año", '4':'Volumenes de agua (bbl) -'+name_campo}
-            fig.for_each_annotation(lambda a: a.update(text = names[a.text]))
-            months=[]
-            
-            for i in datos_iny.columns:
-                if '-' in i:
-                    months.append(i)
-            iny_df=datos_iny[datos_iny['CAMPO']==name_campo]
-            fig.add_trace(
-                go.Scatter(x=months,y=[float(np.array(iny_df[x])[0]) for x in months],name=name_campo,showlegend=False),
-                row=2, col=1)
-            
-            años=np.arange(2017,2022)
-            old=np.array([0,0,0,0,0])
-            for i in datos_iny['CAMPO']:
-                if i!='TOTAL':
-                    campiny=datos_iny[datos_iny['CAMPO']==i]
-                    new=[float(np.array(campiny[age])[0]) for age in años.astype(str)]
-                    fig.add_trace(
-                        go.Bar(name=i, x=años, y=new+old,hovertemplate=['bbl:'+str(x) for x in new],showlegend=False),row=2, col=2)
-                    old=new
-            fig.update_layout(barmode='stack')
-            fig.update_yaxes(tickvals=np.arange(0,300000000+1,50000000),row=2, col=2)
-            fig.update_xaxes(tickvals=años,row=2, col=2)
-            fig.update_xaxes(tickangle=45)
-
-            fig.update_layout(
-                scene=dict(
-                annotations=inyec))
-            # except:
-            #         pass
         else:
-            fig=go.Figure()
             INYO={'display': 'none'}
         if np.isin('GEO', GEOL):
             if TOPO==0:
@@ -733,8 +694,6 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             topog.colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow']
             topog.opacity=TOPO
             fig.add_trace(topog,row=sub,col=sub)
-            # fig.add_trace(go.Surface(z=z_topo,showscale=False, x=x_topo, y=y_topo,colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow'],
-            #         showlegend=False,opacity=TOPO,name='Topografía',lighting=dict(ambient=0.3,diffuse=0.5)))
         df_sismos_1=df_sismos[(df_sismos['FECHA - HORA UTC']<=END_DATE)&(df_sismos['FECHA - HORA UTC']>=START_DATE)&
         (df_sismos['MAGNITUD']>=MAGN[0])&(df_sismos['MAGNITUD']<=MAGN[1])
         &(df_sismos['PROF. (m)']>=DEPTH[0])&(df_sismos['PROF. (m)']<=DEPTH[1])]
@@ -913,28 +872,6 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 fig.add_trace(SISMICA)
                 fig.update_layout(scene=dict(annotations=txts_p),
                 overwrite=False)
-        fig.add_trace(go.Cone(x=[-73.1], y=[8.8], z=[10000],
-                      u=[0], v=[10], w=[0],
-                     sizemode='scaled',
-                     sizeref=0.015,
-                     showscale=False,
-                     colorscale=['black','black'],
-                     hoverinfo='none'))
-
-        # fig.update_layout(
-        #         scene=dict(
-        #         annotations=[dict(
-        #                     showarrow=False,
-        #                     x=-73.2,
-        #                     y=8.8,
-        #                     z=10000,
-        #                     text='N',
-        #                     xanchor="left",
-        #                     xshift=0,
-        #                     opacity=1,
-        #                     font=dict(
-        #                         color="black",
-        #                         size=20))]))
         fig.update_layout(autosize=False,
                         width=850, height=600,
                         #margin=dict(l=50, r=50, b=50, t=50),
@@ -1093,6 +1030,49 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
     fig2.update_layout(xaxis_title="Distancia (°)",
                         yaxis_title="Profundidad (m)")
     return fig2
+
+@app.callback(
+     dash.dependencies.Output(component_id='Iny_graph', component_property='figure'),
+
+
+
+    [dash.dependencies.Input(component_id='TINY', component_property='value')])
+
+
+def iny(TINY):
+    datos_iny = pd.read_csv("datasets/inyeccion_geo.csv", delimiter = ';')
+    name_campo=TINY
+    fig = make_subplots(
+        rows=1, cols=2,
+        specs=[[{"type": "scatter"}, {"type": "bar"}]],
+        subplot_titles=('Volumenes de agua (bbl) -'+name_campo, "Total por año" ))
+    months=[]
+    for i in datos_iny.columns:
+        if '-' in i:
+            months.append(i)
+    name_campo='LA CIRA'
+    iny_df=datos_iny[datos_iny['CAMPO']==name_campo]
+
+    fig.add_trace(
+        go.Scatter(x=months,y=[float(np.array(iny_df[x])[0]) for x in months],name=name_campo,showlegend=False),
+        row=1, col=1
+    )
+    años=np.arange(2017,2022)
+    old=np.array([0,0,0,0,0])
+    for i in datos_iny['CAMPO']:
+        if i!='TOTAL':
+            campiny=datos_iny[datos_iny['CAMPO']==i]
+            new=[float(np.array(campiny[age])[0]) for age in años.astype(str)]
+            fig.add_trace(
+                go.Bar(name=i, x=años, y=new+old,hovertemplate=['bbl:'+str(x) for x in new],showlegend=False),row=1, col=2)
+            old=new
+        else:
+            pass
+    fig.update_layout(barmode='stack')
+    fig.update_yaxes(tickvals=np.arange(0,300000000+1,50000000),row=2, col=2)
+    fig.update_xaxes(tickvals=años,row=2, col=2)
+    fig.update_xaxes(tickangle=45)
+    return fig
 
 if __name__ == "__main__":
     app.run_server(debug=True)
