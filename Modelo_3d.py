@@ -104,6 +104,31 @@ play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3=vol_sus(-73.894401
 kalec,_,_,_,_,_,_=vol_sus(-73.8570023, 7.3647499,2325.6,'Kalé - Captador','orange')
 plac,_,_,_,_,_,_=vol_sus(-73.8943024, 7.2566800,2325.6,'Platero - Captador','gold')
 
+kale_tray=pd.read_csv('datasets\Kale-1H_1.csv')
+kale_vert=go.Scatter3d(
+    x=kale_tray[:51]['lon'], y=kale_tray[:51]['lat'], z=kale_tray[:51]['mt'],mode='lines',name='Kalé-Vertical',
+    line=dict(
+        color='red',
+        width=5))
+kale_hort=go.Scatter3d(
+    x=kale_tray[51:]['lon'], y=kale_tray[51:]['lat'], z=kale_tray[51:]['mt'],mode='lines',name='Kalé-Horizontal',
+    line=dict(
+        color='darkblue',
+        width=5))
+
+plat_tray=pd.read_csv('datasets\Platero-1H_1.csv')
+
+plat_vert=go.Scatter3d(
+    x=plat_tray[:36]['lon'], y=plat_tray[:36]['lat'], z=plat_tray[:36]['mt'],mode='lines',name='Platero-Vertical',
+    line=dict(
+        color='red',
+        width=5))
+plat_hort=go.Scatter3d(
+    x=plat_tray[36:]['lon'], y=plat_tray[36:]['lat'], z=plat_tray[36:]['mt'],mode='lines',name='Platero-Horizontal',
+    line=dict(
+        color='darkblue',
+        width=5))
+
 #Estaciones sismologicas
 df_sta_vmm=pd.read_csv('datasets/VMM_STA.csv',delimiter=';',decimal=',')
 df_sta_lom=pd.read_csv('datasets//LOMA_STA.csv',delimiter=';',decimal=',')
@@ -306,6 +331,32 @@ for name,lon,lat,alt in zip(df_andina['texto'],df_andina['x'],df_andina['y'], df
                 size=12
             ))
     txts_p.append(un)
+
+#Hidrogeología
+hidro_well=pd.read_csv('datasets\inv_hidro.csv')
+hidrogeo=go.Scatter3d(
+    x=hidro_well['LONGITUD'],
+    y=hidro_well['LATITUD'],
+    z=np.array(hidro_well['Z_PTO'])+100, #Para sobresalir de la topografía
+    mode='markers',
+    marker_symbol='cross',
+    name='Inventario hidrogeológico',
+    hovertemplate =hidro_well['T_PUNTO']
+                    +'<br>CODIGO SGC: '+hidro_well['COD_SGC']
+                    +'<br>Departamento: '+hidro_well['DEPTO_LOC']
+                    +'<br>Municipio: '+hidro_well['MUN_LOC']
+                    +'<br>Vereda: '+hidro_well['VER_LOC']
+                    +'<br>Sitio: '+hidro_well['SITIO_LOC']
+                    +'<br>Unidad Geológica: '+hidro_well['U_GEOL']
+                    +'<br>COND_SECO: '+hidro_well['COND_SECO'].apply(lambda x:str(x))
+                    +'<br>COND_HUM: '+hidro_well['COND_HUM'].apply(lambda x:str(x))
+                    ,
+    marker=dict(
+        size=4,
+        color='aqua'
+    ),
+    showlegend=False
+)
 
 #exp = open("datasets\Explicacion_modelo3d.txt", "r")
 exp=io.open("datasets\Explicacion_modelo3d.txt", mode="r", encoding="utf-8")
@@ -542,7 +593,7 @@ card_main=dbc.Card(
                             {'label': ' Tope Grupo Chorros (UNAL-ANH-MINCIENCIAS)', 'value': 'CHO'},
                             {'label': ' Discordancia del Eoceno Medio (UNAL-ANH-MINCIENCIAS)', 'value': 'EOC'},
                             {'label': ' Geología superficial (SGC)', 'value': 'GEO'},
-                            
+                            {'label': ' Inventario hidrogeológico (SGC)', 'value': 'HIDROGEO'},
                         ],
                         value=[],
                         multi=True
@@ -758,12 +809,16 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
         #     fig.add_trace(kale)
         if np.isin('KALEi', PPII):
             fig.add_traces([kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3])
+            fig.add_trace(kale_vert)
+            fig.add_trace(kale_hort)
         if np.isin('KALEy', PPII):
             fig.add_traces([kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3])
         if np.isin('KALEc', PPII):
             fig.add_trace(kalec)
         if np.isin('PLATEROi', PPII):
             fig.add_traces([plai,picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3])
+            fig.add_trace(plat_vert)
+            fig.add_trace(plat_hort)
         if np.isin('PLATEROy', PPII):
             fig.add_traces([play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3])
         if np.isin('PLATEROc', PPII):
@@ -873,6 +928,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 eocmedo={'display': 'block'}
         else:
             eocmedo={'display': 'none'}
+        if np.isin('HIDROGEO', GEOL):
+                fig.add_trace(hidrogeo)
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
         if np.isin('SEIS', PETRO):

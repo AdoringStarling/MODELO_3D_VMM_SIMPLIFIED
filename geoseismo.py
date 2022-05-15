@@ -54,7 +54,7 @@ def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
                             z = zb_low.tolist()+[None]+zb_up.tolist(),
                             mode ='lines',
                             line = dict(color=col_cir, width=2),
-                            opacity =0.55, showlegend=False,
+                            opacity =0.3, showlegend=False,
                             name=name)
     return cyl1,bcircles1
 
