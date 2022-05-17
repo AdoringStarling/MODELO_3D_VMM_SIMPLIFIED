@@ -179,7 +179,8 @@ STA_LOM = go.Scatter3d(
 )
 
 #Rios
-df_rivers=pd.read_csv('datasets\drenajes_SIM.csv')
+rivers=pd.read_csv('datasets/drenajes.csv')
+magd=pd.read_csv('datasets/magdalena.csv')
 
 #Cargar datos de pozos
 df_pozos=pd.read_csv('datasets/pozos.csv',usecols=['lon', 'lat', 'UWI', 'WELL_NAME', 
@@ -825,10 +826,28 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             fig.add_trace(plac)
 
         if np.isin('RIV', CART):
-            for i in df_rivers['DRENAJE'].unique():
-                riv=df_rivers[df_rivers['DRENAJE']==i]
-                fig.add_trace(go.Scatter3d(z=riv['Z'], x=riv['X'], y=riv['Y'],mode='markers',
-                name=str(i),marker_symbol='square',marker=dict(color='aqua',size=3),showlegend=False,hovertemplate=str(i)))
+            for i in rivers['LINE_ID'].unique():
+                riv=rivers[rivers['LINE_ID']==i]
+                min=int((riv[riv['DIST_SURF']==riv['DIST_SURF'].min()].index.values)[0])
+                max=int((riv[riv['DIST_SURF']==riv['DIST_SURF'].max()].index.values)[0])
+                riv1=riv[(riv.index>=min)&(riv.index<=max)]
+                if i==25:   
+                    for i in riv1['NOMBRE_GEO'].unique():
+                        riv2=riv1[riv1['NOMBRE_GEO']==i]
+                        fig.add_trace(go.Scatter3d(x=riv2['X'], y=riv2['Y'], z=riv2['Z'],
+                                            hovertemplate=str(i),
+                                            mode='lines',
+                                            name='Ríos',line=dict(color='aqua',width=4),showlegend=False))
+
+                else:
+                    fig.add_trace(go.Scatter3d(x=riv1['X'], y=riv1['Y'], z=riv1['Z'],
+                                            hovertemplate=str(np.array(riv1['NOMBRE_GEO'])[0]),
+                                            mode='lines',
+                                            name='Ríos',line=dict(color='aqua',width=4),showlegend=False))
+            fig.add_trace(go.Scatter3d(x=magd['X'], y=magd['Y'], z=magd['Z'],
+                                            hovertemplate='Río Magdalena',
+                                            mode='lines',
+                                            name='Ríos',line=dict(color='aqua',width=4),showlegend=False))
         if np.isin('STA', CART):
             fig.add_trace(STA_VMM)
             fig.add_trace(STA_LOM)
