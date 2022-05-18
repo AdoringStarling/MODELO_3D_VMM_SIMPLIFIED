@@ -339,8 +339,7 @@ hidrogeo=go.Scatter3d(
     y=hidro_well['LATITUD'],
     z=np.array(hidro_well['Z_PTO'])+100, #Para sobresalir de la topografía
     mode='markers',
-    marker_symbol='cross',
-    name='Inventario hidrogeológico',
+    name='Inventario de puntos de agua',
     hovertemplate =hidro_well['T_PUNTO']
                     +'<br>CODIGO SGC: '+hidro_well['COD_SGC']
                     +'<br>Departamento: '+hidro_well['DEPTO_LOC']
@@ -352,8 +351,8 @@ hidrogeo=go.Scatter3d(
                     +'<br>COND_HUM: '+hidro_well['COND_HUM'].apply(lambda x:str(x))
                     ,
     marker=dict(
-        size=4,
-        color='aqua'
+        size=2,
+        color='darkblue'
     ),
     showlegend=False
 )
@@ -593,7 +592,7 @@ card_main=dbc.Card(
                             {'label': ' Tope Grupo Chorros (UNAL-ANH-MINCIENCIAS)', 'value': 'CHO'},
                             {'label': ' Discordancia del Eoceno Medio (UNAL-ANH-MINCIENCIAS)', 'value': 'EOC'},
                             {'label': ' Geología superficial (SGC)', 'value': 'GEO'},
-                            {'label': ' Inventario hidrogeológico (SGC)', 'value': 'HIDROGEO'},
+                            {'label': ' Inventario de puntos de agua (SGC)', 'value': 'HIDROGEO'},
                         ],
                         value=[],
                         multi=True
