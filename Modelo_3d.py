@@ -290,12 +290,12 @@ campet_1=pd.read_csv('datasets/campos_1_SIM.csv')
 campet_1=campet_1.drop_duplicates(subset=['LINE_ID'])
 
 # ls_x_s,ls_y_s,ls_z_s=lin_list('datasets/lineas.csv') #Lineas sismicas
-linsis=pd.read_csv('datasets\lineas_SIM.csv',decimal=',')
-linsis['X']=linsis['X'].apply(lambda x:float(x))
-linsis['Y']=linsis['Y'].apply(lambda x:float(x))
-linsis['Z']=linsis['Z'].apply(lambda x:float(x))
-linsis_1=pd.read_csv('datasets/lineas_1_SIM.csv')
-linsis_1=linsis_1.drop_duplicates(subset=['LINE_ID'])
+# linsis=pd.read_csv('datasets\lineas_SIM.csv',decimal=',')
+# linsis['X']=linsis['X'].apply(lambda x:float(x))
+# linsis['Y']=linsis['Y'].apply(lambda x:float(x))
+# linsis['Z']=linsis['Z'].apply(lambda x:float(x))
+# linsis_1=pd.read_csv('datasets/lineas_1_SIM.csv')
+# linsis_1=linsis_1.drop_duplicates(subset=['LINE_ID'])
 
 
 
@@ -311,8 +311,19 @@ Real=geology('datasets/BASE_CUATERNARIO.txt','purple','pink','Tope Grupo Real')
 
 df_new=pd.read_csv('datasets/UN_CRN_COLORS.csv',index_col=None)
 
+#Sismica
+#SISMICA=img_3d("ANH-TR-2006-04-A","assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
+sismica_1=img_3d("ANH-TR-2006-04-A","assets\ANH-TR-2006-04A.jpg",
+                 -74.076876,7.560287,-72.959474,6.809403,1726.31231739848,-7030.775458)
 
-SISMICA=img_3d("ANH-TR-2006-04-A","assets\perfil_2_sintexto.jpg",-74.115,7.58,-72.954,6.806,4300,-20000)
+sismica_2=img_3d("CP-2010-1032","assets\CP-2010-1032.jpg",
+                 -73.73048,7.68415,-73.50918,7.52588,295.6063016,-10267.22761)
+
+sismica_3=img_3d("CP-2008-1385","assets\CP-2008-1385.jpg",
+                 -73.69137,7.45833,-73.47157,7.77188,268.4709044,-9351.70593)
+
+sismica_4=img_3d("CP-2008-1190","assets\CP-2008-1190.jpg",
+                 -73.87223,7.37559,-73.5522,7.77086,281.2813151,-9394.211046)
 
 #Texto de imagenes
 df_andina=pd.read_csv('datasets\Coordenadas_textos_perfil_trasandina.csv',delimiter=';')
@@ -555,10 +566,14 @@ card_main=dbc.Card(
                         options=[
                             {'label': ' Pozos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'POZO'},
                             {'label': ' Campos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'FIELD'},
-                            {'label': ' Trazo en superficie de líneas sísmicas (UNAL-ANH-MINCIENCIAS)', 'value': 'LIN'},
+                            #{'label': ' Trazo en superficie de líneas sísmicas (UNAL-ANH-MINCIENCIAS)', 'value': 'LIN'},
                             {'label': ' Rezumaderos (ANH)', 'value': 'REZ'},
-                            {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS'},
-                            {'label': ' Inyección de agua', 'value': 'H2O'}
+                            {'label': ' Inyección de agua', 'value': 'H2O'},
+                            {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS_1'},
+                            {'label': ' CP-2010-1032 (ANH)', 'value': 'SEIS_2'},
+                            {'label': ' CP-2008-1385 (ANH)', 'value': 'SEIS_3'},
+                            {'label': ' CP-2008-1190 (ANH)', 'value': 'SEIS_4'},
+                            
                             
                         ],
                         value=[],
@@ -843,6 +858,16 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
 
         if np.isin('REZ', PETRO):
             fig.add_trace(rez)
+        #-------
+        if np.isin('SEIS_1', PETRO):
+            fig.add_trace(sismica_1)
+        if np.isin('SEIS_2', PETRO):
+            fig.add_trace(sismica_2)
+        if np.isin('SEIS_3', PETRO):
+            fig.add_trace(sismica_3)
+        if np.isin('SEIS_4', PETRO):
+            fig.add_trace(sismica_4)
+        #---------
         if np.isin('POB', CART):
                 fig.add_trace(Poblaciones)
                 fig.update_layout(
@@ -866,22 +891,22 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                         scene=dict(
                         annotations=inyec),
                 overwrite=False)
-        if np.isin('LIN', PETRO):
-            for i in linsis['LINE_ID'].unique():
-                f=linsis[linsis['LINE_ID']==i]
-                attr=linsis_1[linsis_1['LINE_ID']==i]
-                try:
-                    nom='ssGmStNm:'+np.array(attr['ssGmStNm'])[0]+'<br>Proyecto:'+np.array(attr['project'])[0]
-                except:
-                    nom='_'
-                try:
-                    tip=np.array(attr['owtype'])[0]
-                except:
-                    tip='_'
-                fig.add_trace(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
-                                hovertemplate=nom,
-                                mode='lines',
-                                name=tip,line=dict(color='blue',width=3),showlegend=False),)
+        # if np.isin('LIN', PETRO):
+        #     for i in linsis['LINE_ID'].unique():
+        #         f=linsis[linsis['LINE_ID']==i]
+        #         attr=linsis_1[linsis_1['LINE_ID']==i]
+        #         try:
+        #             nom='ssGmStNm:'+np.array(attr['ssGmStNm'])[0]+'<br>Proyecto:'+np.array(attr['project'])[0]
+        #         except:
+        #             nom='_'
+        #         try:
+        #             tip=np.array(attr['owtype'])[0]
+        #         except:
+        #             tip='_'
+        #         fig.add_trace(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
+        #                         hovertemplate=nom,
+        #                         mode='lines',
+        #                         name=tip,line=dict(color='blue',width=3),showlegend=False),)
         if np.isin('FALL', GEOL):
             for i in fallas['LINE_ID'].unique():
                 f=fallas[fallas['LINE_ID']==i]
