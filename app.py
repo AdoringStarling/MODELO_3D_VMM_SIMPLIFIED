@@ -8,6 +8,7 @@ import numpy as np
 import os
 from plotly.subplots import make_subplots
 import io
+from flask import Flask
 
 from geoseismo import *
 #Area del estudio
@@ -374,7 +375,8 @@ ls_k=[html.H2('¿Cómo funciona el modelo tridimensional del Valle Medio del Mag
 for i in exp:
     ls_k.append(html.H6(i, className="card-text"))
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO])
+server = Flask(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO],server=server)
 app.config['suppress_callback_exceptions'] = True
 #Cargars los datos
 
@@ -420,7 +422,7 @@ card_main=dbc.Card(
                                 tooltip={"placement": "bottom", "always_visible": False})
 
                     ], style= {'display': 'none'}),
-                #Condicionales de geologia-Tope Grupo real
+                #Condicionales de geologia-Tope Fm Mugrosa
                 html.Div(id='MUGROSA', children=[
                         html.H5("Tope Formación Mugrosa:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
@@ -465,28 +467,39 @@ card_main=dbc.Card(
                 step=1,
                 value=2,
                 tooltip={"placement": "bottom", "always_visible": False}),
-            html.H4("Magnitudes:", className="card-subtitle"),
+            html.Div(id='mag_div', children=[html.H4("Magnitudes:", className="card-subtitle"),
                     dcc.RangeSlider(
                 id='MAGN',
                 min=df_sismos['MAGNITUD'].min(),
                 max=df_sismos['MAGNITUD'].max(),
                 step=0.1,
                 value=[df_sismos['MAGNITUD'].min(), df_sismos['MAGNITUD'].max()],
-                # marks=None,
+                marks={
+                        0: {'label':' 0 Ml', 'style': {'color': 'white'}},
+                        1: {'label':'1 Ml', 'style': {'color': 'white'}},
+                        2: {'label':'2 Ml', 'style': {'color': 'white'}},
+                        3: {'label':'3 Ml', 'style': {'color': 'white'}},
+                        4: {'label':'4 Ml', 'style': {'color': 'white'}},
+                        5: {'label':'5 Ml', 'style': {'color': 'white'}}},
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": False}
-            ),
-            html.H4("Profundidad (m):", className="card-subtitle"),
+            )],style={'marginBottom': 25, 'marginTop': 10}),
+            html.Div(id='dep_div', children=[html.H4("Profundidad (m):", className="card-subtitle"),
             dcc.RangeSlider(
                 id='DEPTH',
                 min=df_sismos['PROF. (m)'].min(),
                 max=df_sismos['PROF. (m)'].max(),
                 step=100,
                 value=[df_sismos['PROF. (m)'].min(), df_sismos['PROF. (m)'].max()],
-                # marks=None,
+                marks={
+                        0: {'label':'0 km', 'style': {'color': 'white'}},
+                        -8000: {'label':'8 km', 'style': {'color': 'white'}},
+                        -16000: {'label':'16 km', 'style': {'color': 'white'}},
+                        -24000: {'label':'24 km', 'style': {'color': 'white'}},
+                        -32000: {'label': '32 km', 'style': {'color': 'white'}}},
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": False}
-            ),
+            )],style={'marginBottom': 25, 'marginTop': 25}),
             html.H4("Fecha:", className="card-subtitle"),
             dcc.DatePickerRange(
                     id='DATE',
