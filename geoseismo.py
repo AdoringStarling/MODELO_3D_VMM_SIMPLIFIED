@@ -257,12 +257,19 @@ def geology(url,color_min,color_max,name_geo):
     df_geo.columns = ['Z', 'X', 'Y']
     # df_geo=df_geo[df_geo['Z']<0]
     mesh_geo=df_geo.pivot(index='Y', columns='X',values='Z')
-    geology=go.Surface(z=mesh_geo.values,showscale=False, x=mesh_geo.columns, y=mesh_geo.index,showlegend=False,opacity=0.9,colorscale=[color_max,color_min],name=name_geo)
+    geology=go.Surface(z=mesh_geo.values,showscale=False, x=mesh_geo.columns, y=mesh_geo.index,showlegend=False,opacity=0.9,colorscale=[color_max,color_min],name=name_geo,hovertemplate=name_geo,hoverinfo='none')
     return geology
 
 #Funcion para graficar geologia superficial 
 def geology_super(url,color,name_geo,text,TOPO):
     df_geo=pd.read_csv(url)
+    df_geo=df_geo.drop_duplicates(subset=['X','Y'])
+    mesh_geo=df_geo.pivot(index='Y', columns='X',values='Z')
+    geology=go.Surface(z=mesh_geo.values+5,showscale=False, x=mesh_geo.columns, y=mesh_geo.index,showlegend=False,opacity=TOPO,colorscale=[color,color],name=name_geo,
+                                hovertemplate=text,lighting=dict(ambient=0.2))
+    return geology
+
+def geology_super_1(df_geo,color,name_geo,text,TOPO):
     df_geo=df_geo.drop_duplicates(subset=['X','Y'])
     mesh_geo=df_geo.pivot(index='Y', columns='X',values='Z')
     geology=go.Surface(z=mesh_geo.values+5,showscale=False, x=mesh_geo.columns, y=mesh_geo.index,showlegend=False,opacity=TOPO,colorscale=[color,color],name=name_geo,

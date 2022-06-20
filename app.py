@@ -179,6 +179,10 @@ STA_LOM = go.Scatter3d(
     showlegend=False
 )
 
+#Geologia superficial
+df_geos=pd.read_csv('datasets/geo_unit_sup.csv')
+
+
 #Rios
 rivers=pd.read_csv('datasets/drenajes.csv')
 
@@ -298,13 +302,14 @@ campet_1=campet_1.drop_duplicates(subset=['LINE_ID'])
 # linsis_1=pd.read_csv('datasets/lineas_1_SIM.csv')
 # linsis_1=linsis_1.drop_duplicates(subset=['LINE_ID'])
 
+#FDB46C
 
 
-Eoceno=geology('datasets/DISCORDANCIA_EOCENO.txt','pink','red','Discordancia del Eoceno Medio')
-Colorado=geology('datasets/TOPE_COLORADO.txt','darkblue','aquamarine','Tope Formación Colorado')
-Mugrosa=geology('datasets/TOPE_MUGROSA.txt','green','greenyellow','Tope Formación Mugrosa')
-Chorros=geology('datasets/TOPE_CHORROS.txt','orangered','yellow','Tope Grupo Chorros')
-Real=geology('datasets/BASE_CUATERNARIO.txt','purple','pink','Tope Grupo Real')
+Eoceno=geology('datasets/DISCORDANCIA_EOCENO.txt','#FDA75F','#9d4702','Discordancia del Eoceno Medio')
+Colorado=geology('datasets/TOPE_COLORADO.txt','#FEC07A','#d06f01','Tope Formación Colorado')
+Mugrosa=geology('datasets/TOPE_MUGROSA.txt','#ffa46b','#b34400','Tope Formación Mugrosa')
+Chorros=geology('datasets/TOPE_CHORROS.txt','#FDB46C','#974d02','Tope Grupo Chorros')
+Real=geology('datasets/BASE_CUATERNARIO.txt','#FFFF00','#adad00','Tope Grupo Real')
 
 
 
@@ -376,7 +381,12 @@ for i in exp:
     ls_k.append(html.H6(i, className="card-text"))
 
 server = Flask(__name__)
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SUPERHERO],server=server)
+app = dash.Dash(__name__, 
+                external_stylesheets=[dbc.themes.SUPERHERO],
+                server=server,
+                meta_tags=[
+        {"name": "viewport", "content": "width=device-width, initial-scale=1"},
+    ],)
 app.config['suppress_callback_exceptions'] = True
 #Cargars los datos
 
@@ -388,9 +398,9 @@ card_main=dbc.Card(
                 dbc.NavLink("Modelo 3D VMM", href="", active="exact"),
                 dbc.NavLink("Semáforo sísmico", href="https://pinguinodigital.com/wp-content/uploads/2020/08/pagina-en-construcci%C3%B3n1.jpg", active="exact"),
             ]),
-            html.H2("Modelo Tridimensional de Sismicidad en el Valle Medio del Magdalena", className="card-title"),
-            html.H4("Transparencia:", className="card-subtitle"),
-            html.H5("Topografia:", className="card-subtitle"),
+            html.H3("Modelo 3D de Sismicidad en el Valle Medio del Magdalena", className="card-title"),
+            html.H5("Transparencia:", className="card-subtitle"),
+            html.H6("Topografia:", className="card-subtitle"),
             dcc.Slider(
                 id='TOPO',
                 min=0,
@@ -400,7 +410,7 @@ card_main=dbc.Card(
                 tooltip={"placement": "bottom", "always_visible": False}),
                 #Condicionales de geologia-Tope Grupo real
                 html.Div(id='GREAL', children=[
-                        html.H5("Tope Grupo Real:", className="card-subtitle"),
+                        html.H6("Tope Grupo Real:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Slider(id='TGREAL',
                                 min=0,
@@ -412,7 +422,7 @@ card_main=dbc.Card(
                     ], style= {'display': 'none'}),
                 #Condicionales de geologia-Tope Grupo real
                 html.Div(id='COLORADO', children=[
-                        html.H5("Tope Formación Colorado:", className="card-subtitle"),
+                        html.H6("Tope Formación Colorado:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Slider(id='TCOLORADO',
                                 min=0,
@@ -424,7 +434,7 @@ card_main=dbc.Card(
                     ], style= {'display': 'none'}),
                 #Condicionales de geologia-Tope Fm Mugrosa
                 html.Div(id='MUGROSA', children=[
-                        html.H5("Tope Formación Mugrosa:", className="card-subtitle"),
+                        html.H6("Tope Formación Mugrosa:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Slider(id='TMUGROSA',
                                 min=0,
@@ -436,7 +446,7 @@ card_main=dbc.Card(
                     ], style= {'display': 'none'}),
                 #Condicionales de geologia-Tope Grupo real
                 html.Div(id='CHORROS', children=[
-                        html.H5("Tope Formación Chorros:", className="card-subtitle"),
+                        html.H6("Tope Formación Chorros:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Slider(id='TCHORROS',
                                 min=0,
@@ -448,7 +458,7 @@ card_main=dbc.Card(
                     ], style= {'display': 'none'}),
                 #Condicionales de geologia-Tope Grupo real
                 html.Div(id='EOCMED', children=[
-                        html.H5("Discordancia del Eoceno Medio:", className="card-subtitle"),
+                        html.H6("Discordancia del Eoceno Medio:", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Slider(id='TEOCMED',
                                 min=0,
@@ -459,7 +469,7 @@ card_main=dbc.Card(
 
                     ], style= {'display': 'none'}),
            #Fin condicionales
-            html.H4("Exageración vertical:", className="card-subtitle"),
+            html.H5("Exageración vertical:", className="card-subtitle"),
             dcc.Slider(
                 id='EXG',
                 min=1,
@@ -467,7 +477,7 @@ card_main=dbc.Card(
                 step=1,
                 value=2,
                 tooltip={"placement": "bottom", "always_visible": False}),
-            html.Div(id='mag_div', children=[html.H4("Magnitudes:", className="card-subtitle"),
+            html.Div(id='mag_div', children=[html.H5("Magnitudes:", className="card-subtitle"),
                     dcc.RangeSlider(
                 id='MAGN',
                 min=df_sismos['MAGNITUD'].min(),
@@ -484,7 +494,7 @@ card_main=dbc.Card(
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": False}
             )],style={'marginBottom': 25, 'marginTop': 10}),
-            html.Div(id='dep_div', children=[html.H4("Profundidad (m):", className="card-subtitle"),
+            html.Div(id='dep_div', children=[html.H5("Profundidad (m):", className="card-subtitle"),
             dcc.RangeSlider(
                 id='DEPTH',
                 min=df_sismos['PROF. (m)'].min(),
@@ -500,7 +510,7 @@ card_main=dbc.Card(
                 allowCross=False,
                 tooltip={"placement": "bottom", "always_visible": False}
             )],style={'marginBottom': 25, 'marginTop': 25}),
-            html.H4("Fecha:", className="card-subtitle"),
+            html.H5("Fecha:", className="card-subtitle"),
             dcc.DatePickerRange(
                     id='DATE',
                     start_date_placeholder_text="Start Date",
@@ -515,14 +525,14 @@ card_main=dbc.Card(
                     #initial_visible_month=df_sismos['FECHA - HORA UTC'].min(),
                     reopen_calendar_on_clear=False
                 ),
-                html.H4("Perfiles:", className="card-subtitle"),
-                html.H5("Punto 1 (Longitud-Latitud)", className="card-subtitle"),
+                html.H5("Perfiles:", className="card-subtitle"),
+                html.H6("Punto 1 (Longitud-Latitud)", className="card-subtitle"),
                 dcc.Input(id="Longitud 1", type="number", placeholder="Longitud 1", min=loi, max=los, step=0.01,style={'marginRight':'10px'},value=loi),
                 dcc.Input(id="Latitud 1", type="number", placeholder="Latitud 1", min=lai, max=las, step=0.01, debounce=True,value=lai),
-                html.H5("Punto 2 (Longitud-Latitud)", className="card-subtitle"),
+                html.H6("Punto 2 (Longitud-Latitud)", className="card-subtitle"),
                 dcc.Input(id="Longitud 2", type="number", placeholder="Longitud 2", min=loi, max=los, step=0.01,value=los,style={'marginRight':'10px'}),
                 dcc.Input(id="Latitud 2", type="number", placeholder="Latitud 2", min=lai, max=las, step=0.01,value=las,debounce=True),
-            html.H4("Variables de sismicidad desplegadas:", className="card-subtitle"),
+            html.H5("Variables de sismicidad desplegadas:", className="card-subtitle"),
             dcc.Dropdown(id='SEISMO',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -537,8 +547,8 @@ card_main=dbc.Card(
                         value=['LOC', 'FEC','MAG','RMS','ERR','SISM'],
                         multi=True
                     ),
-            html.H4("________________________________________", className="card-subtitle"),
-            html.H4("PPII:", className="card-subtitle"),
+            html.H5("___________________________", className="card-subtitle"),
+            html.H5("PPII:", className="card-subtitle"),
             dcc.Dropdown(id='PPII',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -554,8 +564,8 @@ card_main=dbc.Card(
                         value=[],
                         multi=True
                     ),
-            html.H4("________________________________________", className="card-subtitle"),
-            html.H4("Cartografía base:", className="card-subtitle"),
+            html.H5("___________________________", className="card-subtitle"),
+            html.H5("Cartografía base:", className="card-subtitle"),
             dcc.Dropdown(id='CART',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -571,8 +581,8 @@ card_main=dbc.Card(
                         value=[],
                         multi=True
                     ),
-            html.H4("________________________________________", className="card-subtitle"),
-            html.H4("Información complementaria:", className="card-subtitle"),
+            html.H5("___________________________", className="card-subtitle"),
+            html.H5("Información complementaria:", className="card-subtitle"),
             dcc.Dropdown(id='PETRO',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -594,7 +604,7 @@ card_main=dbc.Card(
                     ),
 #------------Condicional campos--------
                 html.Div(id='INY', children=[
-                        html.H5("Campos (inyección de agua para recobro mejorado):", className="card-subtitle"),
+                        html.H6("Campos (inyección de agua para recobro mejorado):", className="card-subtitle"),
                         # Create element to hide/show, in this case a slider
                         dcc.Dropdown(id='TINY',
                                     placeholder="Campo",
@@ -607,8 +617,8 @@ card_main=dbc.Card(
 
                     ], style= {'display': 'none'}),
 #----------------------------------
-            html.H4("________________________________________", className="card-subtitle"),
-            html.H4("Geología:", className="card-subtitle"),
+            html.H5("___________________________", className="card-subtitle"),
+            html.H5("Geología:", className="card-subtitle"),
             dcc.Dropdown(id='GEOL',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -637,11 +647,11 @@ card_main=dbc.Card(
     color="secondary",   # https://bootswatch.com/default/ for more card colors
     inverse=True,   # change color of text (black or white)
     # outline=False,  # True = remove the block colors from the background and header,
-    style={"overflow": "scroll","width": "28rem",'height':'40rem'},
+    style={"overflow": "scroll",'height':'40rem'},#,"width": "28rem",
 )
 
 card_graph = dbc.Card(
-        dcc.Graph(id='3d_model', figure={}), body=True,color="dark",style={'height':'40rem'}
+        dcc.Graph(id='3d_model', figure={}), body=True,color="dark"#,style={'height':'40rem'}
 )
 
 card_graph_profile = dbc.Card(
@@ -682,15 +692,32 @@ card_references=dbc.Card(
     dbc.CardBody(ls_k
     ))
 
-app.layout = html.Div([
-    dbc.Row([dbc.Col(card_main, width=4),
-             dbc.Col(card_graph, width=8),
-             dbc.Col(card_graph_profile, width=12),
-             dbc.Col(card_iny_graph, width=12),
-             dbc.Col(card_references, width=12)], 
-             justify="start"), 
+# app.layout = html.Div([
+#     dbc.Row([dbc.Col(card_main, style={"Width":"10%"}),
+#              dbc.Col(card_graph, style={"Width":"90%"}),
+#              dbc.Col(card_graph_profile, style={"Width":"100%","height":"24"},width=12),
+#              dbc.Col(card_iny_graph, style={"Width":"100%","height":"24"},width=12),
+#              dbc.Col(card_references, style={"Width":"100%","height":"24"},width=12)], 
+
+#              justify="start"), 
              
-])
+# ])
+app.layout = html.Div([
+    dbc.Row(
+            [dbc.Col(card_main,style={'maxWidth':'25%'}),
+            dbc.Col(card_graph,style={'maxWidth':'75%'})],
+
+             justify="start"),
+     dbc.Row(
+             [dbc.Col(card_graph_profile, width=12)], 
+
+             justify="start"), 
+    dbc.Row([dbc.Col(card_iny_graph, width=12)], 
+
+             justify="start"),
+    dbc.Row([dbc.Col(card_references, width=12)], 
+
+             justify="start"),  ],        )
 
 
 @app.callback(
@@ -764,21 +791,21 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             topog.colorscale=['black','black']
             topog.opacity=TOPO-DISM
             fig.add_trace(topog,row=sub,col=sub)
-            directory = 'datasets\CSV_UNIDADES'
-            for filename in os.scandir(directory):
-                if filename.is_file():
-                    name=(str(filename.path).split('\\'))[-1]
-                    name=name.replace('.csv','')
-                    name=name.replace('_','?')
-                    df_1=df_new[df_new['SimboloUC']==name]
-                    text='Edad: '+np.array(df_1['Edad'].apply(lambda x:str(x)))[0]+'<br>Descripción: '+np.array(df_1['Descripcio'].apply(lambda x:str(x)))[0]#+'<br>UGIntegrad: '+np.array(df_1['UGIntegrad'].apply(lambda x:str(x)))[0]
-                    text=str(text)
-                    fig.add_trace(geology_super(filename.path,np.array(df_1['Color'].apply(lambda x:str(x)))[0],name,text,TOPO))
+            for i in df_geos['name'].unique():
+                name=i.replace('_','?')
+                df_1=df_new[df_new['SimboloUC']==name]
+                df_geos_1=df_geos[df_geos['name']==i]
+                text='Edad: '+np.array(df_1['Edad'].apply(lambda x:str(x)))[0]+'<br>Descripción: '+np.array(df_1['Descripcio'].apply(lambda x:str(x)))[0]
+                text=str(text)
+                fig.add_trace(geology_super_1(df_geos_1,np.array(df_1['Color'].apply(lambda x:str(x)))[0],name,text,TOPO))
             
         else:
-            topog.colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow']
-            topog.opacity=TOPO
-            fig.add_trace(topog,row=sub,col=sub)
+            if TOPO>0:
+                topog.colorscale=['green','greenyellow','saddlebrown','saddlebrown','saddlebrown','saddlebrown','snow','snow']
+                topog.opacity=TOPO
+                fig.add_trace(topog,row=sub,col=sub)
+            else:
+                pass
         df_sismos_1=df_sismos[(df_sismos['FECHA - HORA UTC']<=END_DATE)&(df_sismos['FECHA - HORA UTC']>=START_DATE)&
         (df_sismos['MAGNITUD']>=MAGN[0])&(df_sismos['MAGNITUD']<=MAGN[1])
         &(df_sismos['PROF. (m)']>=DEPTH[0])&(df_sismos['PROF. (m)']<=DEPTH[1])]
@@ -971,12 +998,9 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 fig.add_trace(hidrogeo)
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
-        if np.isin('SEIS', PETRO):
-                fig.add_trace(SISMICA)
-                fig.update_layout(scene=dict(annotations=txts_p),
-                overwrite=False)
-        fig.update_layout(autosize=False,
-                        width=850, height=600,
+        fig.update_layout(autosize=True,height=600,#,width=850,
+                            margin=dict(l=0, r=0, b=0, t=0)
+                        # width=850, height=600,
                         #margin=dict(l=50, r=50, b=50, t=50),
                         )
         fig.update_layout(
