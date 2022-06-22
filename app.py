@@ -5,7 +5,7 @@ from dash import dcc
 import pandas as pd
 import plotly.graph_objects as go
 import numpy as np
-import os
+import time
 from plotly.subplots import make_subplots
 import io
 from flask import Flask
@@ -214,6 +214,23 @@ Pozos = go.Scatter3d(
         color='black'
     )
 )
+
+#Integridad Pozos Kale
+critic=pd.read_csv('datasets/criticidad_integridad_pozos_Kale.csv')
+criticidad=go.Scatter3d(x=critic['lon'],y=critic['lat'],z=[69]*len(critic['X']),
+                        name='Integridad Pozos Kale',
+                        mode='markers',
+                        marker_symbol='diamond',
+                        hovertemplate='Pozo:'+critic['Pozo Revisado'].astype(str)+'<br>Valoración:'+
+                                        critic['Valoración\nde Criticidad'].astype(str)+'<br>Condición:'+
+                                        critic['Condición de\nIntegridad'].astype(str)+'<br>Estado:'+
+                                        critic['Estado del Pozo'].astype(str),
+                        marker=dict(
+                                    size=6,
+                                    color='brown',               
+                                    opacity=1,
+                                ))
+
 
 #Rezumaderos
 df_rezumaderos=pd.read_csv('datasets\REZUMADEROS_WGS84_SIM.txt',decimal=',',delimiter=';')
@@ -588,6 +605,7 @@ card_main=dbc.Card(
                         style={'color': 'black'},
                         options=[
                             {'label': ' Pozos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'POZO'},
+                            {'label': ' Integridad Pozos Kalé', 'value': 'CRT_KALE'},
                             {'label': ' Campos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'FIELD'},
                             #{'label': ' Trazo en superficie de líneas sísmicas (UNAL-ANH-MINCIENCIAS)', 'value': 'LIN'},
                             {'label': ' Rezumaderos (ANH)', 'value': 'REZ'},
@@ -705,7 +723,12 @@ card_references=dbc.Card(
 app.layout = html.Div([
     dbc.Row(
             [dbc.Col(card_main,style={'maxWidth':'25%'}),
-            dbc.Col(card_graph,style={'maxWidth':'75%'})],
+            dbc.Col(card_graph,style={'maxWidth':'75%'}),
+            dcc.Loading(
+                id="loading-1",
+                type="default",
+                children=html.Div(id="loading-output-1")
+        )],
 
              justify="start"),
      dbc.Row(
@@ -728,7 +751,8 @@ app.layout = html.Div([
       dash.dependencies.Output(component_id='MUGROSA', component_property='style'),
       dash.dependencies.Output(component_id='CHORROS', component_property='style'),
       dash.dependencies.Output(component_id='EOCMED', component_property='style'),
-      dash.dependencies.Output(component_id='INY', component_property='style')
+      dash.dependencies.Output(component_id='INY', component_property='style'),
+      dash.dependencies.Output("loading-output-1", "children")
       ],
 
 
@@ -895,6 +919,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
         if np.isin('POZO', PETRO):
             fig.add_trace(Pozos)
+        if np.isin('CRT_KALE', PETRO):
+            fig.add_trace(criticidad)
 
         if np.isin('REZ', PETRO):
             fig.add_trace(rez)
@@ -1008,8 +1034,9 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 xaxis = dict(title='Longitud(°)',nticks=10, range=[loi,los]),
                 yaxis = dict(title='Latitud(°)',nticks=10, range=[lai,las],),
                 zaxis = dict(title='Elevación(msnm)',nticks=10, range=[-32000,10000],),),)
-
-        return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo,INYO
+        
+        loading=time.sleep(1)
+        return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo,INYO,loading
 
 @app.callback(
      dash.dependencies.Output(component_id='Model_profile', component_property='figure'),

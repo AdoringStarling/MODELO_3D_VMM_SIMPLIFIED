@@ -45,7 +45,8 @@ def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
                     colorscale = col_cyl,
                     showscale=False,
                     opacity=opac,
-                    name=name)
+                    name=name,
+                    hovertemplate=name)
     xb_low, yb_low, zb_low = boundary_circle(r1, a1,x01,y01)
     xb_up, yb_up, zb_up = boundary_circle(r1, a1+h1,x01,y01)
 
@@ -55,7 +56,8 @@ def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
                             mode ='lines',
                             line = dict(color=col_cir, width=2),
                             opacity =0.3, showlegend=False,
-                            name=name)
+                            name=name,
+                            hovertemplate=name)
     return cyl1,bcircles1
 
 def vol_sus(x_pozo_inv_kale, y_pozo_inv_kale,h_pozo_inv_kale_m,nam,c):
@@ -146,7 +148,7 @@ def img_3d(nam,url,x0,y0,x1,y1,z0,z1):
     x_data=[x_data]*zs
     xx=np.concatenate(x_data).reshape(yy.shape)
     img = image[:,:, 1]
-    ima_surface=go.Surface(name=str(nam),x=xx, y=yy, z=zz, surfacecolor= np.flipud(img), colorscale='greys', showscale=False)
+    ima_surface=go.Surface(name=str(nam),hovertemplate=str(nam),x=xx, y=yy, z=zz, surfacecolor= np.flipud(img), colorscale='greys', showscale=False)
     return ima_surface
 #Plano de perfil de corte
 def profile_plane(x0,y0,x1,y1):
