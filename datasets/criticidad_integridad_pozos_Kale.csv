@@ -1,6 +1,4 @@
-ITEM,Pozo Revisado,Con Informacion para Integridad,"Valoración
-de Criticidad","Condición de
-Integridad",Estado del Pozo,X,Y,lon,lat
+ITEM,Pozo Revisado,Con Informacion para Integridad,Valoracion,Integridad,Estado del Pozo,X,Y,lon,lat
 1,BOSQUES-1,Cuenta con Información Parcial,0.426,Media,Abandonado,1034428.65,1300884.28,-73.76570937031492,7.316898844029524
 2,BOSQUES-2,Cuenta con Información Parcial,0.584,Media,Abandonado,1037733.102,1304999.149,-73.73575500148544,7.35408400338497
 3,BOSQUES-3,Cuenta con Información Parcial,0.443,Media,Inactivo,1035142.0,1300382.0,-73.75925229394198,7.312352670155121

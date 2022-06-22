@@ -71,7 +71,7 @@ def vol_sus(x_pozo_inv_kale, y_pozo_inv_kale,h_pozo_inv_kale_m,nam,c):
         name=nam,
         hovertemplate ="PPII",
         marker=dict(
-        size=4,
+        size=6,
         color=c
         ))
 

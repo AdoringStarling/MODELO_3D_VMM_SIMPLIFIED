@@ -97,10 +97,10 @@ for name,lon,lat,alt in zip(iny['CAMPO'].apply(lambda x:str(x)),iny['X'],iny['Y'
     inyec.append(un)
 
 #PPII
-kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3=vol_sus(-73.8566, 7.36551,3902,'Kalé - Investigación','yellow')
-kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3=vol_sus(-73.8571014, 7.3647799,2618.232,'Kalé - Inyector','blue')
+kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3=vol_sus(-73.8566, 7.36551,3902,'Kalé - Investigación','blue')
+kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3=vol_sus(-73.8571014, 7.3647799,2618.232,'Kalé - Inyector','aqua')
 plai,picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3=vol_sus(-73.89389, 7.2572498,3227.8,'Platero - Investigación','red')
-play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3=vol_sus(-73.8944016, 7.25667,2325.6,'Platero - Inyector','green')
+play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3=vol_sus(-73.8944016, 7.25667,2325.6,'Platero - Inyector','orange')
 
 kalec,_,_,_,_,_,_=vol_sus(-73.8570023, 7.3647499,2325.6,'Kalé - Captador','orange')
 plac,_,_,_,_,_,_=vol_sus(-73.8943024, 7.2566800,2325.6,'Platero - Captador','gold')
@@ -217,17 +217,25 @@ Pozos = go.Scatter3d(
 
 #Integridad Pozos Kale
 critic=pd.read_csv('datasets/criticidad_integridad_pozos_Kale.csv')
+def Color_Integridad(x):
+    if x=='Baja':
+        return 'green'
+    elif x=='Media':
+        return 'yellow'
+    else:
+        return 'red'
+critic['color']=critic['Integridad'].apply(lambda x:Color_Integridad(x))
 criticidad=go.Scatter3d(x=critic['lon'],y=critic['lat'],z=[69]*len(critic['X']),
                         name='Integridad Pozos Kale',
                         mode='markers',
                         marker_symbol='diamond',
                         hovertemplate='Pozo:'+critic['Pozo Revisado'].astype(str)+'<br>Valoración:'+
-                                        critic['Valoración\nde Criticidad'].astype(str)+'<br>Condición:'+
-                                        critic['Condición de\nIntegridad'].astype(str)+'<br>Estado:'+
+                                        critic['Valoracion'].astype(str)+'<br>Condición:'+
+                                        critic['Integridad'].astype(str)+'<br>Estado:'+
                                         critic['Estado del Pozo'].astype(str),
                         marker=dict(
                                     size=6,
-                                    color='brown',               
+                                    color=critic['color'],               
                                     opacity=1,
                                 ))
 
@@ -423,7 +431,7 @@ card_main=dbc.Card(
                 min=0,
                 max=1,
                 step=0.1,
-                value=1,
+                value=0.9,
                 tooltip={"placement": "bottom", "always_visible": False}),
                 #Condicionales de geologia-Tope Grupo real
                 html.Div(id='GREAL', children=[
@@ -549,7 +557,7 @@ card_main=dbc.Card(
                 html.H6("Punto 2 (Longitud-Latitud)", className="card-subtitle"),
                 dcc.Input(id="Longitud 2", type="number", placeholder="Longitud 2", min=loi, max=los, step=0.01,value=los,style={'marginRight':'10px'}),
                 dcc.Input(id="Latitud 2", type="number", placeholder="Latitud 2", min=lai, max=las, step=0.01,value=las,debounce=True),
-            html.H5("Variables de sismicidad desplegadas:", className="card-subtitle"),
+            html.H5("Variables de sismicidad desplegadas (SGC):", className="card-subtitle"),
             dcc.Dropdown(id='SEISMO',
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
@@ -559,6 +567,7 @@ card_main=dbc.Card(
                             {'label': 'Magnitud', 'value': 'MAG'},
                             {'label': 'RMS', 'value': 'RMS'},
                             {'label': 'Errores', 'value': 'ERR'},
+                            {'label': ' Barras de Error ', 'value': 'ERROR'},
                             {'label': 'Mostrar sismicidad', 'value': 'SISM'}
                         ],
                         value=['LOC', 'FEC','MAG','RMS','ERR','SISM'],
@@ -571,14 +580,18 @@ card_main=dbc.Card(
                         style={'color': 'black'},
                         options=[
                             {'label': ' Pozo Kalé - Investigación (ANH)', 'value': 'KALEi'},
+                            {'label': ' Volúmenes de Monitoreo Kalé - Investigación (ANH)', 'value': 'KALEiv'},
                             {'label': ' Pozo Kalé - Inyector (ANH)', 'value': 'KALEy'},
+                            {'label': ' Volúmenes de Monitoreo Kalé - Inyector (ANH)', 'value': 'KALEyv'},
                             {'label': ' Pozo Kalé - Captador (ANH)', 'value': 'KALEc'},
                             {'label': ' Pozo Platero - Investigación (ANH)', 'value': 'PLATEROi'},
+                            {'label': ' Volúmenes de Monitoreo Platero - Investigación (ANH)', 'value': 'PLATEROiv'},
                             {'label': ' Pozo Platero - Inyector (ANH)', 'value': 'PLATEROy'},
+                            {'label': ' Volúmenes de Monitoreo Platero - Inyector (ANH)', 'value': 'PLATEROyv'},
                             {'label': ' Pozo Platero - Captador (ANH)', 'value': 'PLATEROc'},
                             
                         ],
-                        value=[],
+                        value=['KALEi'],
                         multi=True
                     ),
             html.H5("___________________________", className="card-subtitle"),
@@ -587,7 +600,6 @@ card_main=dbc.Card(
                         placeholder="Variables a desplegar...",
                         style={'color': 'black'},
                         options=[
-                            {'label': ' Barras de Error (SGC)', 'value': 'ERROR'},
                             {'label': ' Estaciones sismológicas (SGC)', 'value': 'STA'},
                             {'label': ' Poblaciones (UNAL-ANH-MINCIENCIAS)', 'value': 'POB'},
                             {'label': ' Drenajes (IGAC)', 'value': 'RIV'},
@@ -605,11 +617,12 @@ card_main=dbc.Card(
                         style={'color': 'black'},
                         options=[
                             {'label': ' Pozos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'POZO'},
-                            {'label': ' Integridad Pozos Kalé', 'value': 'CRT_KALE'},
+                            {'label': ' Integridad Pozos - Kalé (ANH)', 'value': 'CRT_KALE'},
                             {'label': ' Campos petrolíferos (UNAL-ANH-MINCIENCIAS)', 'value': 'FIELD'},
                             #{'label': ' Trazo en superficie de líneas sísmicas (UNAL-ANH-MINCIENCIAS)', 'value': 'LIN'},
                             {'label': ' Rezumaderos (ANH)', 'value': 'REZ'},
-                            {'label': ' Inyección de agua', 'value': 'H2O'},
+                            {'label': ' Inyección de agua para recobor mejorado (ANH)', 'value': 'H2O'},
+                            {'label': ' Inventario de puntos de agua (SGC)', 'value': 'HIDROGEO'},
                             {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS_1'},
                             {'label': ' CP-2010-1032 (ANH)', 'value': 'SEIS_2'},
                             {'label': ' CP-2008-1385 (ANH)', 'value': 'SEIS_3'},
@@ -648,7 +661,7 @@ card_main=dbc.Card(
                             {'label': ' Tope Grupo Chorros (UNAL-ANH-MINCIENCIAS)', 'value': 'CHO'},
                             {'label': ' Discordancia del Eoceno Medio (UNAL-ANH-MINCIENCIAS)', 'value': 'EOC'},
                             {'label': ' Geología superficial (SGC)', 'value': 'GEO'},
-                            {'label': ' Inventario de puntos de agua (SGC)', 'value': 'HIDROGEO'},
+                            
                         ],
                         value=[],
                         multi=True
@@ -838,7 +851,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             vis=True
         else :
             vis=False
-        if np.isin('ERROR', CART):
+        if np.isin('ERROR', SEISMO):
             err=True
         else:
             err=False
@@ -886,19 +899,23 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
         # if np.isin('KALE', CART):
         #     fig.add_trace(kale)
         if np.isin('KALEi', PPII):
-            fig.add_traces([kalei,kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3])
-            fig.add_trace(kale_vert)
-            fig.add_trace(kale_hort)
+            fig.add_traces([kalei,kale_vert,kale_hort])
+        if np.isin('KALEiv', PPII):
+            fig.add_traces([kicyl1,kibcircles1,kicyl2,kibcircles2,kicyl3,kibcircles3])
         if np.isin('KALEy', PPII):
-            fig.add_traces([kaley,kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3])
+            fig.add_trace(kaley)
+        if np.isin('KALEyv', PPII):
+            fig.add_traces([kycyl1,kybcircles1,kycyl2,kybcircles2,kycyl3,kybcircles3])
         if np.isin('KALEc', PPII):
             fig.add_trace(kalec)
         if np.isin('PLATEROi', PPII):
-            fig.add_traces([plai,picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3])
-            fig.add_trace(plat_vert)
-            fig.add_trace(plat_hort)
+            fig.add_traces([plai,plat_vert,plat_hort])
+        if np.isin('PLATEROiv', PPII):
+            fig.add_traces([picyl1,pibcircles1,picyl2,pibcircles2,picyl3,pibcircles3])
         if np.isin('PLATEROy', PPII):
-            fig.add_traces([play,pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3])
+            fig.add_trace(play)
+        if np.isin('PLATEROyv', PPII):
+            fig.add_traces([pycyl1,pybcircles1,pycyl2,pybcircles2,pycyl3,pybcircles3])
         if np.isin('PLATEROc', PPII):
             fig.add_trace(plac)
 
@@ -1020,7 +1037,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 eocmedo={'display': 'block'}
         else:
             eocmedo={'display': 'none'}
-        if np.isin('HIDROGEO', GEOL):
+        if np.isin('HIDROGEO', PETRO):
                 fig.add_trace(hidrogeo)
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
@@ -1034,6 +1051,21 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 xaxis = dict(title='Longitud(°)',nticks=10, range=[loi,los]),
                 yaxis = dict(title='Latitud(°)',nticks=10, range=[lai,las],),
                 zaxis = dict(title='Elevación(msnm)',nticks=10, range=[-32000,10000],),),)
+        
+
+        camera = dict(
+                    # up=dict(x=0, y=0, z=1),
+                    center=dict(x=0, y=0, z=0),
+                    eye=dict(x=-1, y=-1, z=2)
+                )
+        # camera = dict(
+        #     eye=dict(x=0., y=0., z=2)
+        # )
+
+        # fig.update_layout(scene_camera=camera, title=name)
+
+
+        fig.update_layout(scene_camera=camera)
         
         loading=time.sleep(1)
         return fig,START_DATE,grealo,coloradoo,mugrosao,chorroso,eocmedo,INYO,loading
@@ -1222,7 +1254,7 @@ def iny(TINY):
             old=new
         else:
             pass
-    fig.update_layout(barmode='stack')
+    fig.update_layout(barmode='stack',title_text="Inyección de agua para recobro mejorado en campos de hidrocarburos (ANH)")
     fig.update_yaxes(tickvals=np.arange(0,300000000+1,50000000),row=2, col=2)
     fig.update_xaxes(tickvals=años,row=2, col=2)
     fig.update_xaxes(tickangle=45)
