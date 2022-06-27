@@ -6,16 +6,19 @@ import math
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon
 
-#Cilindros extracted from https://community.plotly.com/t/basic-3d-cylinders/27990/3
-def cylinder(r, h,x0,y0,a =0, nt=600, nv=50):
+#--
+#Función "cylinder" y "boundary circle" extraido de https://community.plotly.com/t/basic-3d-cylinders/27990/3
+
+def cylinder(r, h,x0,y0,a=0, nt=600, nv=50):
     """
+    Función para generar el arreglo numerico para el cilindro
     r=radio
     h=altura
-    a=altura sobre eje x y y (z)
-    nt=Calidad en un eje
-    nv=Calidad e otro eje
-    x=coordenada x
-    y=coordenada y
+    x0=Centro en x
+    y0=Centro en y
+    a=altura de tope (z)
+    nt=npts eje x
+    nv=npts eje z
     """
     theta = np.linspace(0, 2*np.pi, nt)
     v = np.linspace(a, a+h, nv )
@@ -27,11 +30,12 @@ def cylinder(r, h,x0,y0,a =0, nt=600, nv=50):
 
 def boundary_circle(r, h,x0,y0, nt=600):
     """
-    r - radio del borde
-    h - altura sobre el eje xy (z)
-    nt-calidad de un eje
-    x0-coordenada x
-    y0-coordenada y
+    Función para generar el arreglo numerico del borde del cilindro
+    r=radio del borde
+    h=altura sobre el eje xy (z)
+    nt=npts
+    x0=centro en x
+    y0=centro en y
     """
     theta = np.linspace(0, 2*np.pi, nt)
     x= r*np.cos(theta)+x0
@@ -39,7 +43,13 @@ def boundary_circle(r, h,x0,y0, nt=600):
     z = h*np.ones(theta.shape)
     return x, y, z
 
+#--
+
 def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
+    """
+    Función para generar cilindros basados en un arreglo previamente definido
+    Variables iguales a la funcion "cylinder" y "boundary circle"
+    """
     x1, y1, z1 = cylinder(r1, h1,x01,y01, a=a1)
     cyl1 = go.Surface(x=x1, y=y1, z=z1,
                     colorscale = col_cyl,
@@ -61,17 +71,21 @@ def volumen_semaforo(r1,a1,h1,x01,y01,opac,col_cyl,col_cir,name):
     return cyl1,bcircles1
 
 def vol_sus(x_pozo_inv_kale, y_pozo_inv_kale,h_pozo_inv_kale_m,nam,c):
+        """
+        Función para generar trazas de pozos con volumenes de monitoreo según PPII
+        Variables iguales a la funcion "volumen_semaforo"
+        """
         r_ext = 2*h_pozo_inv_kale_m+20000 #m
         ppii= go.Scatter3d(
         x=np.array(x_pozo_inv_kale),
         y=np.array(y_pozo_inv_kale),
-        z=np.array(300),
+        z=np.array(500),
         mode='markers',
-        marker_symbol='diamond',
+        marker_symbol='diamond-open',
         name=nam,
         hovertemplate ="PPII",
         marker=dict(
-        size=6,
+        size=8,
         color=c
         ))
 
@@ -108,10 +122,12 @@ def geologic_profile(x0,y0,x1,y1,url,name,colr):
         dist=np.sqrt(((x1-x0)**2)+(y1-y0)**2)
         y_lin=np.linspace(y0,y1,int(dist*100))
         x_lin=(slope*y_lin)+intercept
-    z=[]
-    d=[]
+    z,d=[],[]
     for xln,yln in zip(x_lin,y_lin):
-            df_topo_1=df_geo[(df_geo['X']<xln+0.01)&(df_geo['X']>xln-0.01)&(df_geo['Y']>yln-0.01)&(df_geo['Y']<yln+0.01)]
+            df_topo_1=df_geo[(df_geo['X']<xln+0.01)&
+                             (df_geo['X']>xln-0.01)&
+                             (df_geo['Y']>yln-0.01)&
+                             (df_geo['Y']<yln+0.01)]
             dist_2=1
             forms=len(df_topo_1)
             if forms>0:

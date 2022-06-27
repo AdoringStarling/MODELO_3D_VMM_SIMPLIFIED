@@ -185,6 +185,13 @@ df_geos=pd.read_csv('datasets/geo_unit_sup.csv')
 
 #Rios
 rivers=pd.read_csv('datasets/drenajes.csv')
+rivers_ls=[]
+for i in rivers['LINE_ID'].unique():
+    riv1=rivers[rivers['LINE_ID']==i]
+    rivers_ls.append(go.Scatter3d(x=riv1['X'], y=riv1['Y'], z=riv1['Z'],
+                                    hovertemplate=str(np.array(riv1['NOMBRE_GEO'])[0]),
+                                    mode='lines',
+                                    name='Ríos',line=dict(color='aqua',width=4),showlegend=False))
 
 #Cargar datos de pozos
 df_pozos=pd.read_csv('datasets/pozos.csv',usecols=['lon', 'lat', 'UWI', 'WELL_NAME', 
@@ -216,7 +223,7 @@ Pozos = go.Scatter3d(
 )
 
 #Integridad Pozos Kale
-critic=pd.read_csv('datasets/criticidad_integridad_pozos_Kale.csv')
+critic=pd.read_csv('datasets/criticidad_Kale.csv',decimal=',')
 def Color_Integridad(x):
     if x=='Baja':
         return 'green'
@@ -225,11 +232,11 @@ def Color_Integridad(x):
     else:
         return 'red'
 critic['color']=critic['Integridad'].apply(lambda x:Color_Integridad(x))
-criticidad=go.Scatter3d(x=critic['lon'],y=critic['lat'],z=[69]*len(critic['X']),
+criticidad=go.Scatter3d(x=critic['lon'],y=critic['lat'],z=[69+100]*len(critic['X']),
                         name='Integridad Pozos Kale',
                         mode='markers',
                         marker_symbol='diamond',
-                        hovertemplate='Pozo:'+critic['Pozo Revisado'].astype(str)+'<br>Valoración:'+
+                        hovertemplate='Pozo:'+critic['WELL_NAME'].astype(str)+'<br>Valoración:'+
                                         critic['Valoracion'].astype(str)+'<br>Condición:'+
                                         critic['Integridad'].astype(str)+'<br>Estado:'+
                                         critic['Estado del Pozo'].astype(str),
@@ -238,6 +245,24 @@ criticidad=go.Scatter3d(x=critic['lon'],y=critic['lat'],z=[69]*len(critic['X']),
                                     color=critic['color'],               
                                     opacity=1,
                                 ))
+
+well_criticidad=[]
+for i in critic['WELL_NAME']:
+    critic_1=critic[critic['WELL_NAME']==i]
+    TVD=critic_1['WELL_TVD'].values[0]*0.3048
+    if TVD<1:
+        pass
+    else:
+        well_criticidad_1=go.Scatter3d(x=[critic_1['lon'].values[0]]*2,
+                                     y=[critic_1['lat'].values[0]]*2,
+                                     z=[0,TVD*-1],
+                        name=i,
+                        mode='lines',
+                        line=dict(
+                            color='red',
+                            width=5),
+                        showlegend=False)
+        well_criticidad.append(well_criticidad_1)
 
 
 #Rezumaderos
@@ -302,6 +327,11 @@ df_poblaciones['lat'],df_poblaciones['outputSRTM1']):
 #Carreteras
 roads=pd.read_csv('datasets\Via_WGS84_SIM.txt',delimiter=';',decimal=',')
 roads  =roads[(roads['LATITUD']>lai)&(roads['LATITUD']<las)&(roads['LONGITUD']>loi)&(roads['LONGITUD']<los)]
+roads_ls=[]
+for i in roads['GLOBALID'].unique():
+    f=roads[roads['GLOBALID']==i]
+    roads_ls.append(go.Scatter3d(x=f['LONGITUD'], y=f['LATITUD'], z=f['ELEVACION'],
+    hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
 
 # ls_x,ls_y,ls_z=lin_list('datasets/fallas.csv') #Fallas
 fallas=pd.read_csv('datasets/fallas_SIM.csv',decimal=',')
@@ -311,6 +341,24 @@ fallas['Z']=fallas['Z'].apply(lambda x:float(x))
 fallas_1=pd.read_csv('datasets/fallas_1_SIM.csv')
 fallas_1=fallas_1.drop_duplicates(subset=['LINE_ID'])
 
+#pRUEBA
+fallas_ls=[]
+for i in fallas['LINE_ID'].unique():
+    f=fallas[fallas['LINE_ID']==i]
+    attr=fallas_1[fallas_1['LINE_ID']==i]
+    try:
+        nom=np.array(attr['NombreFall'])[0]
+    except:
+        nom='_'
+    try:
+        tip=np.array(attr['Tipo'])[0]
+    except:
+        tip='_'
+    fallas_ls.append(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
+                    hovertemplate=nom,
+                    mode='lines',
+                    name=tip,line=dict(color='red',width=4),showlegend=False),)
+
 # ls_x_f,ls_y_f,ls_z_f=lin_list('datasets/campos.csv') #Campos
 campet=pd.read_csv('datasets\campos_SIM.csv',decimal=',')
 campet['X']=campet['X'].apply(lambda x:float(x))
@@ -318,6 +366,21 @@ campet['Y']=campet['Y'].apply(lambda x:float(x))
 campet['Z']=campet['Z'].apply(lambda x:float(x))
 campet_1=pd.read_csv('datasets/campos_1_SIM.csv')
 campet_1=campet_1.drop_duplicates(subset=['LINE_ID'])
+
+campet_ls=[]
+for i in campet['LINE_ID'].unique():
+    f=campet[campet['LINE_ID']==i]
+    attr=campet_1[campet_1['LINE_ID']==i]
+    nom='Compañia:'+np.array(attr['Compañia'])[0]+'<br>Estado:'+np.array(attr['Estado'])[0]+'<br>Información:'+str(np.array(attr['INFO'])[0])
+    try:
+        tip='Campo petrolífero '+np.array(attr['Campo'])[0]
+    except:
+        tip='_'
+    campet_ls.append(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
+                    hovertemplate=nom,
+                    mode='lines',
+                    name=tip,line=dict(color='black',width=3),showlegend=False),)
+
 
 # ls_x_s,ls_y_s,ls_z_s=lin_list('datasets/lineas.csv') #Lineas sismicas
 # linsis=pd.read_csv('datasets\lineas_SIM.csv',decimal=',')
@@ -676,13 +739,12 @@ card_main=dbc.Card(
                  ,], 
         ),
     color="secondary",   # https://bootswatch.com/default/ for more card colors
-    inverse=True,   # change color of text (black or white)
-    # outline=False,  # True = remove the block colors from the background and header,
-    style={"overflow": "scroll",'height':'40rem'},#,"width": "28rem",
+    inverse=True,
+    style={"overflow": "scroll",'height':'40rem'},
 )
 
 card_graph = dbc.Card(
-        dcc.Graph(id='3d_model', figure={}), body=True,color="dark"#,style={'height':'40rem'}
+        dcc.Graph(id='3d_model', figure={}), body=True,color="dark"
 )
 
 card_graph_profile = dbc.Card(
@@ -694,8 +756,6 @@ card_iny_graph = dbc.Card(
 )
 
 references=[
-        # html.H2("Explicacion del Modelo 3d", className="card-title"),
-        # html.H6(exp, className="card-text"),
         html.H2("Referencias", className="card-title"),
         html.H6("Agencia Nacional de Hidrocarburos - ANH & Servicio Geológico Colombiano - SGC (2016). Informe final del Convenio interadministrativo 194 ANH-014 SGC, entre la Agencia Nacional de Hidrocarburos y el Servicio Geológico Colombiano.", 
             className="card-text"),
@@ -723,25 +783,20 @@ card_references=dbc.Card(
     dbc.CardBody(ls_k
     ))
 
-# app.layout = html.Div([
-#     dbc.Row([dbc.Col(card_main, style={"Width":"10%"}),
-#              dbc.Col(card_graph, style={"Width":"90%"}),
-#              dbc.Col(card_graph_profile, style={"Width":"100%","height":"24"},width=12),
-#              dbc.Col(card_iny_graph, style={"Width":"100%","height":"24"},width=12),
-#              dbc.Col(card_references, style={"Width":"100%","height":"24"},width=12)], 
-
-#              justify="start"), 
-             
-# ])
 app.layout = html.Div([
     dbc.Row(
-            [dbc.Col(card_main,style={'maxWidth':'25%'}),
-            dbc.Col(card_graph,style={'maxWidth':'75%'}),
-            dcc.Loading(
+            [dcc.Loading(
                 id="loading-1",
                 type="default",
-                children=html.Div(id="loading-output-1")
-        )],
+                #fullscreen=True,
+                children=html.Div(id="loading-output-1"),
+                debug=True,
+                loading_state={'component_name':'Cargando...',
+                            'prop_name':'Cargando...',
+                            'is_loading':True}),
+        dbc.Col(card_main,style={'maxWidth':'25%'}),
+        dbc.Col(card_graph,style={'maxWidth':'75%'}),
+        ],
 
              justify="start"),
      dbc.Row(
@@ -803,8 +858,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             iny=iny[:-1]
             ls_form=[False]*len(iny['CAMPO'])
             ls_form[-1]=True
-            # try:
-            for i,cond in zip(iny['CAMPO'],ls_form):
+            for i,_ in zip(iny['CAMPO'],ls_form):
                     inyc=iny[iny['CAMPO']==i]
                     fig.add_trace(go.Scatter3d(x=[float(inyc['X'])]*2, y=[float(inyc['Y'])]*2, z=[0,-1*float(inyc['prof'])],
                                 hovertemplate=[inyc['CAMPO'].apply(lambda x:str(x))+'<br>'
@@ -814,8 +868,6 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                                     width=20,colorscale='Jet',
                                 cmax=((iny['TOTAL_bbl'])).max(),
                                 cmin=((iny['TOTAL_bbl'])).min(),
-                                #showscale=cond,
-                                #colorbar={"title": 'Volumen de <br>inyección (BBL)','x': 1.25}
                                 )
                                 ,showlegend=False),)
         else:
@@ -896,8 +948,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 showlegend=False,
                 visible=vis
                 ),row=sub,col=sub)
-        # if np.isin('KALE', CART):
-        #     fig.add_trace(kale)
+
         if np.isin('KALEi', PPII):
             fig.add_traces([kalei,kale_vert,kale_hort])
         if np.isin('KALEiv', PPII):
@@ -920,25 +971,17 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             fig.add_trace(plac)
 
         if np.isin('RIV', CART):
-            for i in rivers['LINE_ID'].unique():
-                riv1=rivers[rivers['LINE_ID']==i]
-                fig.add_trace(go.Scatter3d(x=riv1['X'], y=riv1['Y'], z=riv1['Z'],
-                                                hovertemplate=str(np.array(riv1['NOMBRE_GEO'])[0]),
-                                                mode='lines',
-                                                name='Ríos',line=dict(color='aqua',width=4),showlegend=False))
+            fig.add_traces(rivers_ls)
         if np.isin('STA', CART):
             fig.add_trace(STA_VMM)
             fig.add_trace(STA_LOM)
         if np.isin('VIA', CART):
-            for i in roads['GLOBALID'].unique():
-                f=roads[roads['GLOBALID']==i]
-                fig.add_trace(go.Scatter3d(x=f['LONGITUD'], y=f['LATITUD'], z=f['ELEVACION'],
-                hovertemplate=str(i),mode='lines',name='Via',line=dict(color='yellow',width=2),showlegend=False),)
+            fig.add_traces(roads_ls)
         if np.isin('POZO', PETRO):
             fig.add_trace(Pozos)
         if np.isin('CRT_KALE', PETRO):
             fig.add_trace(criticidad)
-
+            fig.add_traces(well_criticidad)
         if np.isin('REZ', PETRO):
             fig.add_trace(rez)
         #-------
@@ -958,22 +1001,11 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 annotations=Pobl),
                 overwrite=False)
         if np.isin('FIELD', PETRO):
-            for i in campet['LINE_ID'].unique():
-                f=campet[campet['LINE_ID']==i]
-                attr=campet_1[campet_1['LINE_ID']==i]
-                nom='Compañia:'+np.array(attr['Compañia'])[0]+'<br>Estado:'+np.array(attr['Estado'])[0]+'<br>Información:'+str(np.array(attr['INFO'])[0])
-                try:
-                    tip='Campo petrolífero '+np.array(attr['Campo'])[0]
-                except:
-                    tip='_'
-                fig.add_trace(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
-                                hovertemplate=nom,
-                                mode='lines',
-                                name=tip,line=dict(color='black',width=3),showlegend=False),)
-                fig.update_layout(
-                        scene=dict(
-                        annotations=inyec),
-                overwrite=False)
+            fig.add_traces(campet_ls)
+            fig.update_layout(
+                    scene=dict(
+                    annotations=inyec),
+            overwrite=False)
         # if np.isin('LIN', PETRO):
         #     for i in linsis['LINE_ID'].unique():
         #         f=linsis[linsis['LINE_ID']==i]
@@ -991,21 +1023,7 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
         #                         mode='lines',
         #                         name=tip,line=dict(color='blue',width=3),showlegend=False),)
         if np.isin('FALL', GEOL):
-            for i in fallas['LINE_ID'].unique():
-                f=fallas[fallas['LINE_ID']==i]
-                attr=fallas_1[fallas_1['LINE_ID']==i]
-                try:
-                    nom=np.array(attr['NombreFall'])[0]
-                except:
-                    nom='_'
-                try:
-                    tip=np.array(attr['Tipo'])[0]
-                except:
-                    tip='_'
-                fig.add_trace(go.Scatter3d(x=f['X'], y=f['Y'], z=f['Z'],
-                                hovertemplate=nom,
-                                mode='lines',
-                                name=tip,line=dict(color='red',width=4),showlegend=False),)
+            fig.add_traces(fallas_ls)
         if np.isin('REAL', GEOL):
                 Real.opacity=TGREAL
                 fig.add_trace(Real)
@@ -1041,10 +1059,8 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
                 fig.add_trace(hidrogeo)
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
-        fig.update_layout(autosize=True,height=600,#,width=850,
+        fig.update_layout(autosize=True,height=600,
                             margin=dict(l=0, r=0, b=0, t=0)
-                        # width=850, height=600,
-                        #margin=dict(l=50, r=50, b=50, t=50),
                         )
         fig.update_layout(
         scene = dict(aspectratio=dict(x=1,y=1.785714286,z=(42000/155540)*EXG),
@@ -1054,16 +1070,9 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
         
 
         camera = dict(
-                    # up=dict(x=0, y=0, z=1),
                     center=dict(x=0, y=0, z=0),
                     eye=dict(x=-1, y=-1, z=2)
                 )
-        # camera = dict(
-        #     eye=dict(x=0., y=0., z=2)
-        # )
-
-        # fig.update_layout(scene_camera=camera, title=name)
-
 
         fig.update_layout(scene_camera=camera)
         
@@ -1219,11 +1228,7 @@ def update_profile(START_DATE,END_DATE,MAGN,DEPTH,SEISMO,x0,x1,y0,y1):
 
 @app.callback(
      dash.dependencies.Output(component_id='Iny_graph', component_property='figure'),
-
-
-
     [dash.dependencies.Input(component_id='TINY', component_property='value')])
-
 
 def iny(TINY):
     datos_iny = pd.read_csv("datasets/inyeccion_geo.csv", delimiter = ';')
@@ -1236,7 +1241,7 @@ def iny(TINY):
     for i in datos_iny.columns:
         if '-' in i:
             months.append(i)
-    name_campo='LA CIRA'
+    # name_campo='LA CIRA'
     iny_df=datos_iny[datos_iny['CAMPO']==name_campo]
 
     fig.add_trace(
