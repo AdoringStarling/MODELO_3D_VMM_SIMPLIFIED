@@ -462,7 +462,44 @@ hidrogeo=go.Scatter3d(
     showlegend=False
 )
 
-#exp = open("datasets\Explicacion_modelo3d.txt", "r")
+#Pozos en prof hidrogeo
+hw=pd.read_csv('datasets/pozos_adquisicion_hidro.csv')
+
+hidro_wells=go.Scatter3d(x=hw['lon'],y=hw['lat'],z=[69]*len(hw['lon']),
+                        name='Pozos de agua subterránea',
+                        mode='markers',
+                        marker_symbol='diamond',
+                        hovertemplate='Pozo:'+hw['NOMBRE'].astype(str)+'<br>CONSECUTIVO:'+
+                                              hw['CONSECUTIVO'].astype(str)+'<br>pH:'+
+                                              hw['pH'].astype(str)+'<br>CE(µS/cm):'+
+                                              hw['CE(µS/cm)'].astype(str)+'<br>Ca(mg/L):'+
+                                              hw['Ca(mg/L)'].astype(str)+'<br>HCO3(mg/L):'+
+                                              hw['HCO3(mg/L)'].astype(str)+'<br>Prof(m):'+
+                                              hw['Prof(m)'].astype(str)
+                                        ,
+                        marker=dict(
+                                    size=6,
+                                    color='blue',               
+                                    opacity=1,
+                                ))
+
+hw_ls=[]
+for i in hw['NOMBRE']:
+    hw_1=hw[hw['NOMBRE']==i]
+    prof=hw_1['Prof(m)'].values[0]
+    hw_2=go.Scatter3d(x=[hw_1['lon'].values[0]]*2,
+                                    y=[hw_1['lat'].values[0]]*2,
+                                    z=[69,prof*-1],
+                    name=i,
+                    mode='lines',
+                    line=dict(
+                        color='aqua',
+                        width=5),
+                    showlegend=False)
+    hw_ls.append(hw_2)
+
+
+#Explicacion modelo
 exp=io.open("datasets\Explicacion_modelo3d.txt", mode="r", encoding="utf-8")
 ls_k=[html.H2('¿Cómo funciona el modelo tridimensional del Valle Medio del Magdalena?', className="card-text")]
 for i in exp:
@@ -686,6 +723,7 @@ card_main=dbc.Card(
                             {'label': ' Rezumaderos (ANH)', 'value': 'REZ'},
                             {'label': ' Inyección de agua para recobor mejorado (ANH)', 'value': 'H2O'},
                             {'label': ' Inventario de puntos de agua (SGC)', 'value': 'HIDROGEO'},
+                            {'label': ' Pozos de agua subterránea', 'value': 'HIDROWELL'},
                             {'label': ' ANH-TR-2006-04-A (ANH)', 'value': 'SEIS_1'},
                             {'label': ' CP-2010-1032 (ANH)', 'value': 'SEIS_2'},
                             {'label': ' CP-2008-1385 (ANH)', 'value': 'SEIS_3'},
@@ -1057,6 +1095,9 @@ def update_figure(TOPO,EXG,START_DATE,END_DATE,MAGN,DEPTH,SEISMO,PPII,CART,PETRO
             eocmedo={'display': 'none'}
         if np.isin('HIDROGEO', PETRO):
                 fig.add_trace(hidrogeo)
+        if np.isin('HIDROWELL', PETRO):
+                fig.add_trace(hidro_wells)
+                fig.add_traces(hw_ls)
         if np.isin('PER', CART):
                 fig.add_trace(profile_plane(x0,y0,x1,y1))
         fig.update_layout(autosize=True,height=600,
